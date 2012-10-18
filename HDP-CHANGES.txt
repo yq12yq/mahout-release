@@ -1,0 +1,4 @@
+Created branch hdp-mahout-0.7 from release tag mahout-0.7
+
+Bimota: 
+	MAHOUT-1102 - Mahout build fails for default profile if hadoop.version is passed as argument
