@@ -34,6 +34,8 @@ fi
 START_PATH=`pwd`
 
 WORK_DIR=/tmp/mahout-work-${USER}
+MAHOUT=${MAHOUT:-../../bin/mahout}
+
 algorithm=( cnaivebayes naivebayes sgd clean)
 if [ -n "$1" ]; then
   choice=$1
@@ -83,24 +85,24 @@ if [ "x$alg" == "xnaivebayes"  -o  "x$alg" == "xcnaivebayes" ]; then
   cp -R ${WORK_DIR}/20news-bydate/*/* ${WORK_DIR}/20news-all
 
   echo "Creating sequence files from 20newsgroups data"
-  ./bin/mahout seqdirectory \
+  ${MAHOUT} seqdirectory \
     -i ${WORK_DIR}/20news-all \
     -o ${WORK_DIR}/20news-seq
 
   echo "Converting sequence files to vectors"
-  ./bin/mahout seq2sparse \
+  ${MAHOUT} seq2sparse \
     -i ${WORK_DIR}/20news-seq \
     -o ${WORK_DIR}/20news-vectors  -lnorm -nv  -wt tfidf
 
   echo "Creating training and holdout set with a random 80-20 split of the generated vector dataset"
-  ./bin/mahout split \
+  ${MAHOUT} split \
     -i ${WORK_DIR}/20news-vectors/tfidf-vectors \
     --trainingOutput ${WORK_DIR}/20news-train-vectors \
     --testOutput ${WORK_DIR}/20news-test-vectors  \
     --randomSelectionPct 40 --overwrite --sequenceFiles -xm sequential
 
   echo "Training Naive Bayes model"
-  ./bin/mahout trainnb \
+  ${MAHOUT} trainnb \
     -i ${WORK_DIR}/20news-train-vectors -el \
     -o ${WORK_DIR}/model \
     -li ${WORK_DIR}/labelindex \
@@ -108,7 +110,7 @@ if [ "x$alg" == "xnaivebayes"  -o  "x$alg" == "xcnaivebayes" ]; then
 
   echo "Self testing on training set"
 
-  ./bin/mahout testnb \
+  ${MAHOUT} testnb \
     -i ${WORK_DIR}/20news-train-vectors\
     -m ${WORK_DIR}/model \
     -l ${WORK_DIR}/labelindex \
@@ -116,7 +118,7 @@ if [ "x$alg" == "xnaivebayes"  -o  "x$alg" == "xcnaivebayes" ]; then
 
   echo "Testing on holdout set"
 
-  ./bin/mahout testnb \
+  ${MAHOUT} testnb \
     -i ${WORK_DIR}/20news-test-vectors\
     -m ${WORK_DIR}/model \
     -l ${WORK_DIR}/labelindex \
@@ -125,10 +127,10 @@ if [ "x$alg" == "xnaivebayes"  -o  "x$alg" == "xcnaivebayes" ]; then
 elif [ "x$alg" == "xsgd" ]; then
   if [ ! -e "/tmp/news-group.model" ]; then
     echo "Training on ${WORK_DIR}/20news-bydate/20news-bydate-train/"
-    ./bin/mahout org.apache.mahout.classifier.sgd.TrainNewsGroups ${WORK_DIR}/20news-bydate/20news-bydate-train/
+    ${MAHOUT} org.apache.mahout.classifier.sgd.TrainNewsGroups ${WORK_DIR}/20news-bydate/20news-bydate-train/
   fi
   echo "Testing on ${WORK_DIR}/20news-bydate/20news-bydate-test/ with model: /tmp/news-group.model"
-  ./bin/mahout org.apache.mahout.classifier.sgd.TestNewsGroups --input ${WORK_DIR}/20news-bydate/20news-bydate-test/ --model /tmp/news-group.model
+  ${MAHOUT} org.apache.mahout.classifier.sgd.TestNewsGroups --input ${WORK_DIR}/20news-bydate/20news-bydate-test/ --model /tmp/news-group.model
 elif [ "x$alg" == "xclean" ]; then
   rm -rf ${WORK_DIR}
   rm -rf /tmp/news-group.model

@@ -50,6 +50,7 @@ START_PATH=`pwd`
 
 
 WORK_DIR=/tmp/mahout-work-${USER}
+MAHOUT=${MAHOUT:-../../bin/mahout}
 
 echo "creating work directory at ${WORK_DIR}"
 mkdir -p ${WORK_DIR}
@@ -69,7 +70,7 @@ if [ "$HADOOP_HOME" != "" ]; then
     $HADOOP_HOME/bin/hadoop fs -put ${WORK_DIR}/synthetic_control.data testdata
     echo "Successfully Uploaded Synthetic control data to HDFS "
 
-    ../../bin/mahout org.apache.mahout.clustering.syntheticcontrol."${clustertype}".Job
+    ${MAHOUT} org.apache.mahout.clustering.syntheticcontrol."${clustertype}".Job
   else
     echo " HADOOP is not running. Please make sure you hadoop is running. "
   fi

@@ -38,7 +38,7 @@ then
   exit -1
 fi
 
-MAHOUT="../../bin/mahout"
+MAHOUT=${MAHOUT:-../../bin/mahout}
 
 WORK_DIR=/tmp/mahout-work-${USER}
 echo "creating work directory at ${WORK_DIR}"

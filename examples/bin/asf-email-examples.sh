@@ -55,7 +55,7 @@ if [ "$0" != "$SCRIPT_PATH" ] && [ "$SCRIPT_PATH" != "" ]; then
   cd $SCRIPT_PATH
 fi
 START_PATH=`pwd`
-MAHOUT="../../bin/mahout"
+MAHOUT=${MAHOUT:-../../bin/mahout}
 ASF_ARCHIVES=$1
 OUT=$2
 

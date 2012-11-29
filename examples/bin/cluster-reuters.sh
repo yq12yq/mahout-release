@@ -32,7 +32,7 @@ if [ "$0" != "$SCRIPT_PATH" ] && [ "$SCRIPT_PATH" != "" ]; then
   cd $SCRIPT_PATH
 fi
 
-MAHOUT="../../bin/mahout"
+MAHOUT=${MAHOUT:-../../bin/mahout}
 
 if [ ! -e $MAHOUT ]; then
   echo "Can't find mahout driver in $MAHOUT, cwd `pwd`, exiting.."
