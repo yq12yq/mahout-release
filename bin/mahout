@@ -248,6 +248,7 @@ else
     (*)
       echo "MAHOUT-JOB: $MAHOUT_JOB"
       export HADOOP_CLASSPATH=$MAHOUT_CONF_DIR:${HADOOP_CLASSPATH}
+      export HADOOP_CLIENT_OPTS=$JAVA_HEAP_MAX
       exec "$HADOOP_BINARY" jar $MAHOUT_JOB $CLASS "$@"
     esac
   fi
