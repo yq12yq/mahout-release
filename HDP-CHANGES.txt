@@ -1,6 +1,7 @@
 Created branch hdp-mahout-0.7 from release tag mahout-0.7
 
 Bimota: 
+   MAHOUT-958. NullPointerException in RepresentativePointsMapper when running cluster-reuters.sh example with kmeans
    MAHOUT-1102. Mahout build fails for default profile if hadoop.version is passed as argument
    MAHOUT-1120. Mahout examples script execution fails as part of rpm install.
     
