@@ -4,4 +4,9 @@ Bimota:
    MAHOUT-958. NullPointerException in RepresentativePointsMapper when running cluster-reuters.sh example with kmeans
    MAHOUT-1102. Mahout build fails for default profile if hadoop.version is passed as argument
    MAHOUT-1120. Mahout examples script execution fails as part of rpm install.
+
+
+Condor:
+   Build Changes via hash 2e32282f4e622e620f8b940ab2a78947b7ea8ff9 for
+   artifact publishing.
     
