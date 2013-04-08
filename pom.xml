@@ -99,6 +99,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hadoop.version>0.20.204.0</hadoop.version>
     <lucene.version>3.6.0</lucene.version>
+    <!--<site_url>file:///tmp</site_url>-->
+    <site_url>scp://people.apache.org/home/isabel/public_html/mahout_site</site_url>
+    <repoid>maven-s3-release-repo</repoid>
+    <repourl>s3://repo.hortonworks.com/release</repourl>
+    <reponame>Nexus Release Repository</reponame>
   </properties>
   <issueManagement>
     <system>Jira</system>
@@ -860,8 +865,13 @@
   <distributionManagement>
     <site>
       <id>Website</id>
-      <url>scp://people.apache.org/home/isabel/public_html/mahout_site</url>
+      <url>${site_url}</url>
     </site>
+    <repository>
+      <id>${repoid}</id>
+      <name>${reponame}</name>
+      <url>${repourl}</url>
+    </repository>
   </distributionManagement>
   <reporting>
     <plugins>
