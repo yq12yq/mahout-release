@@ -9,4 +9,7 @@ Bimota:
 Condor:
    Build Changes via hash 2e32282f4e622e620f8b940ab2a78947b7ea8ff9 for
    artifact publishing.
+   
+   
+COMANCHE:
     
