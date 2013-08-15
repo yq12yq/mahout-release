@@ -31,6 +31,7 @@ import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterator;
 import org.apache.mahout.utils.MahoutTestCase;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -75,6 +76,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     }    
   }
 
+ @Ignore
   @Test
   public void testSequential() throws Exception {
 

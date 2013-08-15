@@ -50,7 +50,12 @@ public class SolveImplicitFeedbackMapper
   @Override
   protected void map(IntWritable userOrItemID, VectorWritable ratingsWritable, Context ctx)
     throws IOException, InterruptedException {
-    ImplicitFeedbackAlternatingLeastSquaresSolver solver = getSharedInstance();
+    ImplicitFeedbackAlternatingLeastSquaresSolver solver;
+      if(getSharedInstance() != null ){
+          solver = getSharedInstance();
+      } else {
+          solver = createSharedInstance(ctx);
+      }
     uiOrmj.set(solver.solve(ratingsWritable.get()));
     ctx.write(userOrItemID, uiOrmj);
   }

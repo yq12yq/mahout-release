@@ -53,7 +53,12 @@ public class SolveExplicitFeedbackMapper
   @Override
   protected void map(IntWritable userOrItemID, VectorWritable ratingsWritable, Context ctx)
     throws IOException, InterruptedException {
-    OpenIntObjectHashMap<Vector> uOrM = getSharedInstance();
+      OpenIntObjectHashMap<Vector> uOrM;
+      if(getSharedInstance() != null){
+     uOrM = getSharedInstance();
+      } else{
+           uOrM = createSharedInstance(ctx);
+      }
     uiOrmj.set(ALS.solveExplicit(ratingsWritable, uOrM, lambda, numFeatures));
     ctx.write(userOrItemID, uiOrmj);
   }

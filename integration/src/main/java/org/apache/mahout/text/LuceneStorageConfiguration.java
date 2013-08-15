@@ -25,6 +25,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DefaultStringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -133,10 +134,10 @@ public class LuceneStorageConfiguration implements Writable {
    * @return a {@link Configuration} object with a String serialization
    * @throws IOException if serialization fails
    */
-  public Configuration serialize() throws IOException {
+  public JobConf serialize() throws IOException {
     DefaultStringifier.store(configuration, this, KEY);
 
-    return new Configuration(configuration);
+    return new JobConf(configuration);
   }
 
   /**

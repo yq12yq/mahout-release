@@ -94,8 +94,6 @@ public class HighDFWordsPrunerTest extends MahoutTestCase {
     argList.add(inputPath.toString());
     argList.add("-o");
     argList.add(outputPath.toString());
-    argList.add("--mapred");
-    argList.add(getTestTempDir("mapred" + Math.random()).getAbsolutePath());
     if (prune) {
       argList.add("-xs");
       argList.add("3"); // we prune all words that are outside 3*sigma

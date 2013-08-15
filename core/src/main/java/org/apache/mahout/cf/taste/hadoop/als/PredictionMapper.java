@@ -84,7 +84,12 @@ public class PredictionMapper extends SharingMapper<IntWritable,VectorWritable,L
   protected void map(IntWritable userIndexWritable, VectorWritable ratingsWritable, Context ctx)
     throws IOException, InterruptedException {
 
-    Pair<OpenIntObjectHashMap<Vector>, OpenIntObjectHashMap<Vector>> uAndM = getSharedInstance();
+    Pair<OpenIntObjectHashMap<Vector>, OpenIntObjectHashMap<Vector>> uAndM;
+      if(getSharedInstance() != null){
+          uAndM = getSharedInstance();
+      }else {
+          uAndM = createSharedInstance(ctx);
+      }
     OpenIntObjectHashMap<Vector> U = uAndM.getFirst();
     OpenIntObjectHashMap<Vector> M = uAndM.getSecond();
 
