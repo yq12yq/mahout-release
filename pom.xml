@@ -104,8 +104,8 @@
     <mcheckstyle.version>2.10</mcheckstyle.version>
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
-    <hadoop.version>2.1.0-mr1-cdh5.0.0-SNAPSHOT</hadoop.version>
-    <hadoop2.version>2.1.0-cdh5.0.0-SNAPSHOT</hadoop2.version>
+    <hadoop.version>2.0.0-mr1-cdh4.2.0-SNAPSHOT</hadoop.version>
+    <hadoop2.version>2.0.5.2.0.3.0-70</hadoop2.version>
     <lucene.version>4.3.0</lucene.version>
   </properties>
   <issueManagement>
@@ -123,12 +123,8 @@
       </releases>
     </repository>
       <repository>
-          <id>cloudera</id>
-          <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-      </repository>
-      <repository>
-          <id>cloudera-repo-releases</id>
-          <url>https://repository.cloudera.com/artifactory/repo/</url>
+          <id>horton</id>
+          <url>http://54.235.92.15/nexus/content/groups/public</url>
       </repository>
   </repositories>
 
