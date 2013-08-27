@@ -229,55 +229,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-client</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>2.4.1</version>
     </dependency>
 
   </dependencies>
-
-  
-  <profiles>
-    <profile>
-      <id>hadoop-0.20</id>
-      <activation>
-        <property>
-          <name>!hadoop.version</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-core</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>hadoop-0.23</id>
-      <activation>
-        <property>
-          <name>hadoop.version</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-common</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-mapreduce-client-common</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.hadoop</groupId>
-          <artifactId>hadoop-mapreduce-client-core</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

@@ -104,8 +104,7 @@
     <mcheckstyle.version>2.10</mcheckstyle.version>
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
-    <hadoop.version>2.0.0-mr1-cdh4.2.0-SNAPSHOT</hadoop.version>
-    <hadoop2.version>2.0.5.2.0.3.0-70</hadoop2.version>
+    <hadoop2.version>2.1.0.2.0.5.0-10</hadoop2.version>
     <lucene.version>4.3.0</lucene.version>
   </properties>
   <issueManagement>
@@ -212,69 +211,6 @@
 
       <dependency>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-core</artifactId>
-        <version>${hadoop.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>net.sf.kosmosfs</groupId>
-            <artifactId>kfs</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>oro</groupId>
-            <artifactId>oro</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-api-2.1</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>servlet-api-2.5</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>tomcat</groupId>
-            <artifactId>jasper-runtime</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>tomcat</groupId>
-            <artifactId>jasper-compiler</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>xmlenc</groupId>
-            <artifactId>xmlenc</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>net.java.dev.jets3t</groupId>
-            <artifactId>jets3t</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jdt</groupId>
-            <artifactId>core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
         <artifactId>hadoop-common</artifactId>
         <version>${hadoop2.version}</version>
         <exclusions>
@@ -346,11 +282,6 @@
         <artifactId>hadoop-mapreduce-client-common</artifactId>
         <version>${hadoop2.version}</version>
       </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.hadoop</groupId>
