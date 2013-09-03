@@ -1,2 +1,1 @@
-git@github.com:hortonworks/mahout.git   @  bighweel-beta2-0.8.0  branched from apache 
-git://git.apache.org/mahout.git  @  mahout-0.8 (8e3f6960ec83163f588c77e2f7989d53d165d24c)
+git@github.com:hortonworks/mahout.git   @ bigwheel-GA-0.8.0 is branched from hortonworks  bighweel-beta2-0.8.0 (55ed1b8a46e1c60464219d312c9417f855479ab9)
