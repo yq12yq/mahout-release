@@ -19,11 +19,11 @@ package org.apache.mahout.text;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
-import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
-import org.apache.lucene.index.*;
+import org.apache.lucene.index.SegmentInfoPerCommit;
+import org.apache.lucene.index.SegmentInfos;
 import org.apache.mahout.common.HadoopUtil;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ import java.io.IOException;
 
 import static java.util.Arrays.asList;
 
-public class LuceneSegmentRecordReaderTest extends AbstractLuceneStorageTest {
+public class LuceneSegmentRecordReaderHadoop1Test extends AbstractLuceneStorageTest {
   private Configuration configuration;
 
 
@@ -58,7 +58,7 @@ public class LuceneSegmentRecordReaderTest extends AbstractLuceneStorageTest {
     for (SegmentInfoPerCommit segmentInfo : segmentInfos) {
       int docId = 0;
       LuceneSegmentInputSplit inputSplit = new LuceneSegmentInputSplit(getIndexPath1(), segmentInfo.info.name, segmentInfo.sizeInBytes());
-        TaskAttemptContextImpl context = new TaskAttemptContextImpl(configuration, new TaskAttemptID());
+        TaskAttemptContext context = new TaskAttemptContext(configuration, new TaskAttemptID());
       recordReader.initialize(inputSplit, context);
       for (int i = 0; i < 500; i++){
         recordReader.nextKeyValue();

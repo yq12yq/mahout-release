@@ -129,16 +129,28 @@ public class LuceneStorageConfiguration implements Writable {
   }
 
   /**
-   * Serializes this object in a Hadoop {@link Configuration}
+   * Serializes this object in a Hadoop2 {@link Configuration}
    *
    * @return a {@link Configuration} object with a String serialization
    * @throws IOException if serialization fails
    */
-  public JobConf serialize() throws IOException {
+  public JobConf serializeToJobConf() throws IOException {
     DefaultStringifier.store(configuration, this, KEY);
 
     return new JobConf(configuration);
   }
+
+    /**
+     * Serializes this object in a Hadoop1 {@link Configuration}
+     *
+     * @return a {@link Configuration} object with a String serialization
+     * @throws IOException if serialization fails
+     */
+    public Configuration serializeToConfiguration() throws IOException {
+        DefaultStringifier.store(configuration, this, KEY);
+
+        return new Configuration(configuration);
+    }
 
   /**
    * Returns an {@link Iterator} which returns (Text, Text) {@link Pair}s of the produced sequence files.

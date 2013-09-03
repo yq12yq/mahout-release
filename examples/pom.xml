@@ -97,6 +97,25 @@
 
   </build>
 
+   <profiles>
+       <profile>
+           <id>hadoop-2</id>
+           <dependencies>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-common</artifactId>
+               </dependency>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-mapreduce-client-common</artifactId>
+               </dependency>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-mapreduce-client-core</artifactId>
+               </dependency>
+           </dependencies>
+       </profile>
+   </profiles>
   <dependencies>
   
     <!-- our modules -->
@@ -123,19 +142,6 @@
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-integration</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
     </dependency>
 
     <dependency>
@@ -172,12 +178,4 @@
 
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>release.prepare</id>
-      <properties>
-        <mahout.skip.example>true</mahout.skip.example>
-      </properties>
-    </profile>
-  </profiles>
 </project>

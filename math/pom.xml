@@ -171,23 +171,30 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-common</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-mapreduce-client-core</artifactId>
-    </dependency>
-    
-    <dependency>
       <groupId>com.carrotsearch.randomizedtesting</groupId>
       <artifactId>randomizedtesting-runner</artifactId>
       <version>2.0.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+    <profiles>
+        <profile>
+            <id>hadoop2</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-common</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-mapreduce-client-core</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

@@ -35,7 +35,7 @@ public class LuceneStorageConfigurationTest {
     LuceneStorageConfiguration luceneStorageConfiguration =
       new LuceneStorageConfiguration(configuration, asList(indexPath), outputPath, "id", asList("field"));
 
-    Configuration serializedConfiguration = luceneStorageConfiguration.serialize();
+    Configuration serializedConfiguration = luceneStorageConfiguration.serializeToConfiguration();
 
     LuceneStorageConfiguration deSerializedConfiguration = new LuceneStorageConfiguration(serializedConfiguration);
 

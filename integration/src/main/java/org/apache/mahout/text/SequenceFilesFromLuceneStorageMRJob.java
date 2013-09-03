@@ -34,7 +34,7 @@ public class SequenceFilesFromLuceneStorageMRJob {
 
   public void run(LuceneStorageConfiguration lucene2seqConf) {
     try {
-      Configuration configuration = lucene2seqConf.serialize();
+      Configuration configuration = lucene2seqConf.serializeToConfiguration();
 
       Job job = new Job(configuration, "LuceneIndexToSequenceFiles: " + lucene2seqConf.getIndexPaths() + " -> M/R -> "
           + lucene2seqConf.getSequenceFilesOutputPath());

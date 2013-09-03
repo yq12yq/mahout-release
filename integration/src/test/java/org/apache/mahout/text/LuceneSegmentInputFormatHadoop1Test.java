@@ -18,11 +18,9 @@ package org.apache.mahout.text;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobContext;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
-import org.apache.hadoop.mapred.JobContextImpl;
 import org.apache.mahout.common.HadoopUtil;
 import org.apache.mahout.text.doc.SingleFieldDocument;
 import org.junit.After;
@@ -34,11 +32,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class LuceneSegmentInputFormatTest extends AbstractLuceneStorageTest {
+public class LuceneSegmentInputFormatHadoop1Test extends AbstractLuceneStorageTest {
 
   private LuceneSegmentInputFormat inputFormat;
-  private Job jobContext;
-  private JobConf conf;
+  private JobContext jobContext;
+  private Configuration conf;
 
   @Before
   public void before() throws IOException {
@@ -46,7 +44,7 @@ public class LuceneSegmentInputFormatTest extends AbstractLuceneStorageTest {
     LuceneStorageConfiguration lucene2SeqConf = new LuceneStorageConfiguration(new Configuration(), Collections.singletonList(indexPath1), new Path("output"), "id", Collections.singletonList("field"));
     conf = lucene2SeqConf.serializeToJobConf();
 
-    jobContext = new Job(conf, new JobID().toString());
+    jobContext = new JobContext(conf, new JobID());
   }
 
   @After
