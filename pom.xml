@@ -105,6 +105,9 @@
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
     <lucene.version>4.3.0</lucene.version>
+    <hadoop.2.version>2.1.0</hadoop.2.version>
+    <hadoop.1.version>1.1.2</hadoop.1.version>
+    <hbase.version>0.95.0</hbase.version>
   </properties>
   <issueManagement>
     <system>Jira</system>
@@ -668,20 +671,22 @@
   </modules>
   <profiles>
       <profile>
-          <id>hadoop-1</id>
+          <id>hadoop1</id>
           <activation>
+              <activeByDefault>true</activeByDefault>
               <property>
-                  <name>hadoop1.version</name>
+                  <name>hadoop.profile</name>
+                  <value>100</value>
               </property>
           </activation>
           <properties>
-              <hadoop.version>1.1.2</hadoop.version>
+              <hadoop.version>${hadoop.1.version}</hadoop.version>
           </properties>
           <dependencies>
               <dependency>
                   <groupId>org.apache.hadoop</groupId>
                   <artifactId>hadoop-core</artifactId>
-                <version>${hadoop1.version}</version>
+                <version>${hadoop.version}</version>
                 <exclusions>
                   <exclusion>
                       <groupId>net.sf.kosmosfs</groupId>
@@ -745,12 +750,16 @@
 
       </profile>
       <profile>
-          <id>hadoop-2</id>
+          <id>hadoop2</id>
           <activation>
               <property>
-                  <name>hadoop.version</name>
+                  <name>hadoop.profile</name>
+                  <value>200</value>
               </property>
           </activation>
+          <properties>
+              <hadoop.version>${hadoop.2.version}</hadoop.version>
+          </properties>
               <dependencies>
               <dependency>
                   <groupId>org.apache.hadoop</groupId>
@@ -761,11 +770,6 @@
                   <groupId>log4j</groupId>
                   <artifactId>log4j</artifactId>
                   <version>1.2.17</version>
-              </dependency>
-              <dependency>
-                  <groupId>com.google.protobuf</groupId>
-                  <artifactId>protobuf-java</artifactId>
-                  <version>2.4.1</version>
               </dependency>
           </dependencies>
       </profile>
