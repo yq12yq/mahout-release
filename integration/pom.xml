@@ -86,10 +86,12 @@
 
     <profiles>
         <profile>
-            <id>hadoop-1</id>
+            <id>hadoop1</id>
             <activation>
+                <activeByDefault>true</activeByDefault>
                 <property>
-                    <name>hadoop1.version</name>
+                    <name>hadoop.profile</name>
+                    <value>100</value>
                 </property>
             </activation>
             <build>
@@ -122,10 +124,11 @@
             </build>
         </profile>
         <profile>
-            <id>hadoop-2</id>
+            <id>hadoop2</id>
             <activation>
                 <property>
-                    <name>hadoop.version</name>
+                    <name>hadoop.profile</name>
+                    <value>200</value>
                 </property>
             </activation>
             <build>
@@ -257,8 +260,24 @@
 
     <dependency>
       <groupId>org.apache.hbase</groupId>
+      <artifactId>hbase-common</artifactId>
+      <version>${hbase.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+         <groupId>log4j</groupId>
+         <artifactId>log4j</artifactId>
+       </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.hbase</groupId>
       <artifactId>hbase-client</artifactId>
-      <version>0.95.0</version>
+      <version>${hbase.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
