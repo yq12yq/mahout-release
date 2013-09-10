@@ -312,7 +312,7 @@ public final class HBaseDataModel implements DataModel, Closeable {
     }
 
     if (result.containsColumn(ITEMS_CF, Bytes.toBytes(itemID))) {
-      KeyValue kv = result.getColumnLatest(ITEMS_CF, Bytes.toBytes(itemID));
+      Cell kv = result.getColumnLatest(ITEMS_CF, Bytes.toBytes(itemID));
       return kv.getTimestamp();
     } else {
       return null;
