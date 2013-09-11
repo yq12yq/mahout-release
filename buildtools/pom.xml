@@ -24,7 +24,7 @@
     <groupId>org.apache.mahout</groupId>
     <artifactId>mahout</artifactId>
     <version>0.8</version>
-    <relativePath />
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.apache.mahout</groupId>
