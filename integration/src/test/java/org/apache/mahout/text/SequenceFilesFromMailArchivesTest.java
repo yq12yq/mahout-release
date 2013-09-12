@@ -63,7 +63,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     } finally {
       Closeables.close(gzOut, false);
     }
-    
+
     File subDir2 = new File(subDir, "subsubdir");
     subDir2.mkdir();
     File gzFile2 = new File(subDir2, "mail-messages-2.gz");
@@ -73,10 +73,9 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
       gzOut.finish();
     } finally {
       Closeables.close(gzOut, false);
-    }    
+    }
   }
 
- @Ignore
   @Test
   public void testSequential() throws Exception {
 
