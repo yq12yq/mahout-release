@@ -106,6 +106,7 @@
     <mjavadoc.version>2.9.1</mjavadoc.version>
     <lucene.version>4.3.0</lucene.version>
     <hadoop.2.version>2.1.0</hadoop.2.version>
+    <hadoopWin.2.version>2.1.1-SNAPSHOT</hadoopWin.2.version>
     <hadoop.1.version>1.1.2</hadoop.1.version>
     <hbase.version>0.95.0</hbase.version>
   </properties>
@@ -115,17 +116,14 @@
   </issueManagement>
 
   <repositories>
-    <repository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>http://repository.apache.org/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
+
       <repository>
           <id>horton</id>
           <url>http://54.235.92.15/nexus/content/groups/public</url>
+      </repository>
+      <repository>
+          <id>localp</id>
+          <url>C:\Users\Administrator\.m2\repository</url>
       </repository>
   </repositories>
 
@@ -561,23 +559,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <forkCount>1</forkCount>
-          <reuseForks>false</reuseForks>
-          <threadCount>1</threadCount>
-          <perCoreThreadCount>false</perCoreThreadCount>
-          <parallel>classes</parallel>
-          <argLine>-Xmx512m</argLine>
-          <testFailureIgnore>false</testFailureIgnore>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <systemPropertyVariables>
-            <mahout.test.directory>${project.build.directory}</mahout.test.directory>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
         <inherited>false</inherited>
         <configuration>
@@ -671,9 +652,79 @@
   </modules>
   <profiles>
       <profile>
-          <id>hadoop1</id>
+          <id>hadoopWin2</id>
           <activation>
               <activeByDefault>true</activeByDefault>
+              <property>
+                  <name>hadoop.win.profile</name>
+                  <value>200</value>
+              </property>
+          </activation>
+          <properties>
+              <hadoop.version>${hadoopWin.2.version}</hadoop.version>
+          </properties>
+          <dependencies>
+              <dependency>
+                  <groupId>commons-io</groupId>
+                  <artifactId>commons-io</artifactId>
+                  <version>2.4</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.apache.hadoop</groupId>
+                  <artifactId>hadoop-auth</artifactId>
+                  <version>${hadoop.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>log4j</groupId>
+                  <artifactId>log4j</artifactId>
+                  <version>1.2.17</version>
+              </dependency>
+              <dependency>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+                  <version>2.6</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.apache.hadoop</groupId>
+                  <artifactId>hadoop-yarn-common</artifactId>
+                  <version>${hadoop.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.apache.hadoop</groupId>
+                  <artifactId>hadoop-yarn-api</artifactId>
+                  <version>${hadoop.version}</version>
+              </dependency>
+              <dependency>
+                  <groupId>com.google.protobuf</groupId>
+                  <artifactId>protobuf-java</artifactId>
+                  <version>2.5.0</version>
+              </dependency>
+          </dependencies>
+          <build>
+              <plugins>
+                  <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                         <forkCount>1</forkCount>
+                         <reuseForks>false</reuseForks>
+                         <threadCount>1</threadCount>
+                         <perCoreThreadCount>false</perCoreThreadCount>
+                         <parallel>classes</parallel>
+                         <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
+                         <testFailureIgnore>false</testFailureIgnore>
+                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                         <systemPropertyVariables>
+                          <mahout.test.directory>${project.build.directory}</mahout.test.directory>
+                        </systemPropertyVariables>
+                    </configuration>
+                  </plugin>
+              </plugins>
+          </build>
+      </profile>
+      <profile>
+          <id>hadoop1</id>
+          <activation>
               <property>
                   <name>hadoop.profile</name>
                   <value>100</value>
@@ -747,7 +798,27 @@
               </exclusions>
           </dependency>
       </dependencies>
-
+          <build>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                      <forkCount>1</forkCount>
+                      <reuseForks>false</reuseForks>
+                      <threadCount>1</threadCount>
+                      <perCoreThreadCount>false</perCoreThreadCount>
+                      <parallel>classes</parallel>
+                      <argLine>-Xmx512m</argLine>
+                      <testFailureIgnore>false</testFailureIgnore>
+                      <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                      <systemPropertyVariables>
+                          <mahout.test.directory>${project.build.directory}</mahout.test.directory>
+                      </systemPropertyVariables>
+                  </configuration>
+              </plugin>
+          </plugins>
+          </build>
       </profile>
       <profile>
           <id>hadoop2</id>
@@ -772,6 +843,27 @@
                   <version>1.2.17</version>
               </dependency>
           </dependencies>
+          <build>
+          <plugins>
+              <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <configuration>
+                      <forkCount>1</forkCount>
+                      <reuseForks>false</reuseForks>
+                      <threadCount>1</threadCount>
+                      <perCoreThreadCount>false</perCoreThreadCount>
+                      <parallel>classes</parallel>
+                      <argLine>-Xmx512m</argLine>
+                      <testFailureIgnore>false</testFailureIgnore>
+                      <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                      <systemPropertyVariables>
+                          <mahout.test.directory>${project.build.directory}</mahout.test.directory>
+                      </systemPropertyVariables>
+                  </configuration>
+              </plugin>
+          </plugins>
+          </build>
       </profile>
     <profile>
       <id>fastinstall</id>

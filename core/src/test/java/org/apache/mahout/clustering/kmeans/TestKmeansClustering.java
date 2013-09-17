@@ -149,7 +149,7 @@ public final class TestKmeansClustering extends MahoutTestCase {
         Closeables.close(writer, false);
       }
       // now run the Job
-      Path outputPath = getTestTempDirPath("output");
+      Path outputPath = getTestTempDirPath("output" + Integer.toString(k));
       // KMeansDriver.runJob(pointsPath, clustersPath, outputPath,
       // EuclideanDistanceMeasure.class.getName(), 0.001, 10, k + 1, true);
       String[] args = {optKey(DefaultOptionCreator.INPUT_OPTION), pointsPath.toString(),
@@ -206,7 +206,7 @@ public final class TestKmeansClustering extends MahoutTestCase {
         Closeables.close(writer, false);
       }
       // now run the Job
-      Path outputPath = getTestTempDirPath("output");
+      Path outputPath = getTestTempDirPath("output" + Integer.toString(k));
       // KMeansDriver.runJob(pointsPath, clustersPath, outputPath,
       // EuclideanDistanceMeasure.class.getName(), 0.001, 10, k + 1, true);
       String[] args = {optKey(DefaultOptionCreator.INPUT_OPTION), pointsPath.toString(),

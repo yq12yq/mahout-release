@@ -159,24 +159,39 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     Pair<Text, Text> record = iterator.next();
 
     File parentFileSubSubDir = new File(new File(new File(new File("TEST"), "subdir"), "subsubdir"), "mail-messages-2.gz");
-
-    Assert.assertEquals(new File(parentFileSubSubDir, testVars[0][0]).toString(), record.getFirst().toString());
+    String expected = record.getFirst().toString();
+    if(System.getProperty("os.name").startsWith("Windows")){
+      expected = expected.replace("/", "\\");
+    }
+    Assert.assertEquals(new File(parentFileSubSubDir, testVars[0][0]).toString(), expected);
     Assert.assertEquals(testVars[0][1] + testVars[0][2], record.getSecond().toString());
     Assert.assertTrue("Second key/value pair not found!", iterator.hasNext());
 
     record = iterator.next();
-    Assert.assertEquals(new File(parentFileSubSubDir, testVars[1][0]).toString(), record.getFirst().toString());
+    expected = record.getFirst().toString();
+    if(System.getProperty("os.name").startsWith("Windows")){
+       expected = expected.replace("/", "\\");
+    }
+    Assert.assertEquals(new File(parentFileSubSubDir, testVars[1][0]).toString(), expected);
     Assert.assertEquals(testVars[1][1] + testVars[1][2], record.getSecond().toString());
 
     // test other file
     File parentFile = new File(new File(new File("TEST"), "subdir"), "mail-messages.gz");
     record = iterator.next();
-    Assert.assertEquals(new File(parentFile, testVars[0][0]).toString(), record.getFirst().toString());
+    expected = record.getFirst().toString();
+    if(System.getProperty("os.name").startsWith("Windows")){
+      expected = expected.replace("/", "\\");
+    }
+    Assert.assertEquals(new File(parentFile, testVars[0][0]).toString(), expected);
     Assert.assertEquals(testVars[0][1] + testVars[0][2], record.getSecond().toString());
     Assert.assertTrue("Second key/value pair not found!", iterator.hasNext());
 
     record = iterator.next();
-    Assert.assertEquals(new File(parentFile, testVars[1][0]).toString(), record.getFirst().toString());
+    expected = record.getFirst().toString();
+    if(System.getProperty("os.name").startsWith("Windows")){
+       expected = expected.replace("/", "\\");
+    }
+    Assert.assertEquals(new File(parentFile, testVars[1][0]).toString(), expected);
     Assert.assertEquals(testVars[1][1] + testVars[1][2], record.getSecond().toString());
     Assert.assertFalse("Only four key/value pairs expected!", iterator.hasNext());
   }

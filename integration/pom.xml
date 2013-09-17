@@ -83,8 +83,70 @@
     </plugins>
 
   </build>
-
     <profiles>
+        <profile>
+            <id>hadoopWin2</id>
+            <activation>
+                <property>
+                    <name>hadoop.win.profile</name>
+                    <value>200</value>
+                </property>
+            </activation>
+                     <dependencies>
+
+                         <dependency>
+                             <groupId>org.apache.hadoop</groupId>
+                             <artifactId>hadoop-common</artifactId>
+                         </dependency>
+
+                         <dependency>
+                             <groupId>org.apache.hadoop</groupId>
+                             <artifactId>hadoop-mapreduce-client-common</artifactId>
+                         </dependency>
+
+                         <dependency>
+                             <groupId>org.apache.hadoop</groupId>
+                             <artifactId>hadoop-mapreduce-client-core</artifactId>
+                         </dependency>
+
+                         <dependency>
+                             <groupId>org.apache.hadoop</groupId>
+                             <artifactId>hadoop-auth</artifactId>
+                             <version>${hadoop.version}</version>
+                         </dependency>
+                     </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>2.3.2</version>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                                <configuration>
+                                    <testExcludes>
+                                        <exclude>
+                                            **/LuceneSegmentRecordReaderHadoop1Test.java
+                                        </exclude>
+                                        <exclude>
+                                            **/LuceneSegmentInputFormatHadoop1Test.java
+                                        </exclude>
+                                        <exclude>
+                                            **/LuceneSegmentRecordReaderTest.java
+                                        </exclude>
+                                    </testExcludes>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>hadoop1</id>
             <activation>
@@ -193,6 +255,8 @@
       </dependency>
 
       <!-- 3rd party -->
+
+
 
     <dependency>
       <groupId>commons-dbcp</groupId>

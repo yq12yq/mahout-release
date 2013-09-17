@@ -99,6 +99,29 @@
 
    <profiles>
        <profile>
+           <id>hadoopWin2</id>
+           <activation>
+               <property>
+                   <name>hadoop.win.profile</name>
+                   <value>200</value>
+               </property>
+           </activation>
+           <dependencies>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-common</artifactId>
+               </dependency>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-mapreduce-client-common</artifactId>
+               </dependency>
+               <dependency>
+                   <groupId>org.apache.hadoop</groupId>
+                   <artifactId>hadoop-mapreduce-client-core</artifactId>
+               </dependency>
+           </dependencies>
+       </profile>
+       <profile>
            <id>hadoop2</id>
           <activation>
               <property>
@@ -213,6 +236,19 @@
        </exclusion>
       </exclusions>
     </dependency>
+
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-common</artifactId>
+      </dependency>
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+      </dependency>
 
   </dependencies>
 
