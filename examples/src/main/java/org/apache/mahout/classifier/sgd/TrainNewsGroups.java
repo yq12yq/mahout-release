@@ -79,7 +79,9 @@ import com.google.common.collect.Ordering;
  * </table>
  */
 public final class TrainNewsGroups {
-
+  private static final String WINDOWS_TEMP_FOLDER = "C:/tmp";
+  private static final String UNIX_TEMP_FOLDER = "/tmp";
+  private static final String WINDOWS_OS = "Windows";
   private TrainNewsGroups() {
   }
 
@@ -132,7 +134,17 @@ public final class TrainNewsGroups {
     SGDHelper.dissect(leakType, newsGroups, learningAlgorithm, files, overallCounts);
     System.out.println("exiting main");
 
-    ModelSerializer.writeBinary("/tmp/news-group.model",
+    String modelPath;
+    if(System.getProperty("os.name").startsWith(WINDOWS_OS)){
+      File tmpWindows = new File(WINDOWS_TEMP_FOLDER);
+      if(!tmpWindows.exists()){
+        tmpWindows.mkdir();
+      }
+      modelPath = WINDOWS_TEMP_FOLDER + "/news-group.model";
+    } else {
+      modelPath = UNIX_TEMP_FOLDER + "/news-group.model";
+    }
+    ModelSerializer.writeBinary(modelPath,
             learningAlgorithm.getBest().getPayload().getLearner().getModels().get(0));
 
     List<Integer> counts = Lists.newArrayList();

@@ -92,29 +92,6 @@
                     <value>200</value>
                 </property>
             </activation>
-                     <dependencies>
-
-                         <dependency>
-                             <groupId>org.apache.hadoop</groupId>
-                             <artifactId>hadoop-common</artifactId>
-                         </dependency>
-
-                         <dependency>
-                             <groupId>org.apache.hadoop</groupId>
-                             <artifactId>hadoop-mapreduce-client-common</artifactId>
-                         </dependency>
-
-                         <dependency>
-                             <groupId>org.apache.hadoop</groupId>
-                             <artifactId>hadoop-mapreduce-client-core</artifactId>
-                         </dependency>
-
-                         <dependency>
-                             <groupId>org.apache.hadoop</groupId>
-                             <artifactId>hadoop-auth</artifactId>
-                             <version>${hadoop.version}</version>
-                         </dependency>
-                     </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -256,7 +233,26 @@
 
       <!-- 3rd party -->
 
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+      </dependency>
 
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-common</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+      </dependency>
+
+      <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-auth</artifactId>
+          <version>${hadoop.version}</version>
+      </dependency>
 
     <dependency>
       <groupId>commons-dbcp</groupId>

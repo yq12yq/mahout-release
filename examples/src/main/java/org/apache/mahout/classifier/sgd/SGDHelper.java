@@ -39,7 +39,9 @@ import com.google.common.collect.Multiset;
 public final class SGDHelper {
 
   private static final String[] LEAK_LABELS = {"none", "month-year", "day-month-year"};
-
+  private static final String WINDOWS_TEMP_FOLDER = "C:/tmp";
+  private static final String UNIX_TEMP_FOLDER = "/tmp";
+  private static final String WINDOWS_OS = "Windows";
   private SGDHelper() {
   }
 
@@ -138,7 +140,17 @@ public final class SGDHelper {
     }
     if (k % (bump * scale) == 0) {
       if (best != null) {
-        ModelSerializer.writeBinary("/tmp/news-group-" + k + ".model",
+          String modelPath;
+          if(System.getProperty("os.name").startsWith(WINDOWS_OS)){
+             File tmpWindows = new File(WINDOWS_TEMP_FOLDER);
+             if(!tmpWindows.exists()){
+               tmpWindows.mkdir();
+             }
+             modelPath = WINDOWS_TEMP_FOLDER + "/news-group-" + k + ".model";
+          } else {
+             modelPath = UNIX_TEMP_FOLDER + "/news-group-" + k + ".model";
+          }
+          ModelSerializer.writeBinary(modelPath,
                 best.getPayload().getLearner().getModels().get(0));
       }
 
