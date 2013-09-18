@@ -106,7 +106,7 @@
     <mjavadoc.version>2.9.1</mjavadoc.version>
     <lucene.version>4.3.0</lucene.version>
     <hadoop.2.version>2.1.0</hadoop.2.version>
-    <hadoopWin.2.version>2.1.1-SNAPSHOT</hadoopWin.2.version>
+    <hadoopWin.2.version>2.2.0.17</hadoopWin.2.version>
     <hadoop.1.version>1.1.2</hadoop.1.version>
     <hbase.version>0.95.0</hbase.version>
   </properties>
@@ -713,7 +713,7 @@
                          <threadCount>1</threadCount>
                          <perCoreThreadCount>false</perCoreThreadCount>
                          <parallel>classes</parallel>
-                         <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
+                         <argLine>-Xmx512m -Djava.library.path=\\sijenkins-vm0\artifacts\bigwheel-ga\latest\bin</argLine>
                          <testFailureIgnore>false</testFailureIgnore>
                          <redirectTestOutputToFile>true</redirectTestOutputToFile>
                          <systemPropertyVariables>
@@ -812,7 +812,7 @@
                       <threadCount>1</threadCount>
                       <perCoreThreadCount>false</perCoreThreadCount>
                       <parallel>classes</parallel>
-                      <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
+                      <argLine>-Xmx512m -Djava.library.path=\\sijenkins-vm0\artifacts\bigwheel-ga\latest\bin</argLine>
                       <testFailureIgnore>false</testFailureIgnore>
                       <redirectTestOutputToFile>true</redirectTestOutputToFile>
                       <systemPropertyVariables>
