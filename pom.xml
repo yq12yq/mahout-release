@@ -713,7 +713,7 @@
                          <threadCount>1</threadCount>
                          <perCoreThreadCount>false</perCoreThreadCount>
                          <parallel>classes</parallel>
-                         <argLine>-Xmx512m -Djava.library.path=\\sijenkins-vm0\artifacts\bigwheel-ga\latest\bin</argLine>
+                         <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
                          <testFailureIgnore>false</testFailureIgnore>
                          <redirectTestOutputToFile>true</redirectTestOutputToFile>
                          <systemPropertyVariables>
@@ -857,7 +857,7 @@
                       <threadCount>1</threadCount>
                       <perCoreThreadCount>false</perCoreThreadCount>
                       <parallel>classes</parallel>
-                      <argLine>-Xmx512m -Djava.library.path=\\sijenkins-vm0\artifacts\bigwheel-ga\latest\bin</argLine>
+                      <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
                       <testFailureIgnore>false</testFailureIgnore>
                       <redirectTestOutputToFile>true</redirectTestOutputToFile>
                       <systemPropertyVariables>
