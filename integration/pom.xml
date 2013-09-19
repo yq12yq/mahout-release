@@ -113,9 +113,6 @@
                                         <exclude>
                                             **/LuceneSegmentInputFormatHadoop1Test.java
                                         </exclude>
-                                        <exclude>
-                                            **/LuceneSegmentRecordReaderTest.java
-                                        </exclude>
                                     </testExcludes>
                                 </configuration>
                             </execution>
