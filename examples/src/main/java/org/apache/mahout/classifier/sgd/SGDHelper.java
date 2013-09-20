@@ -139,7 +139,7 @@ public final class SGDHelper {
     if (k % (bump * scale) == 0) {
       if (best != null) {
           File tmpFile = new File(System.getProperty("java.io.tmpdir"));
-          ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+"/news-group-" + k + ".model",
+          ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+System.getProperty("file.separator")+"news-group-" + k + ".model",
                 best.getPayload().getLearner().getModels().get(0));
       }
 

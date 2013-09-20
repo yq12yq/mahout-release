@@ -132,7 +132,7 @@ public final class TrainNewsGroups {
     SGDHelper.dissect(leakType, newsGroups, learningAlgorithm, files, overallCounts);
     System.out.println("exiting main");
     File tmpFile = new File(System.getProperty("java.io.tmpdir"));
-    ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+"/news-group.model",
+    ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+System.getProperty("file.separator")+"news-group.model",
             learningAlgorithm.getBest().getPayload().getLearner().getModels().get(0));
 
     List<Integer> counts = Lists.newArrayList();
