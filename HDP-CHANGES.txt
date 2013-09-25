@@ -1,15 +1,1 @@
-Created branch hdp-mahout-0.7 from release tag mahout-0.7
-
-Bimota: 
-   MAHOUT-958. NullPointerException in RepresentativePointsMapper when running cluster-reuters.sh example with kmeans
-   MAHOUT-1102. Mahout build fails for default profile if hadoop.version is passed as argument
-   MAHOUT-1120. Mahout examples script execution fails as part of rpm install.
-
-
-Condor:
-   Build Changes via hash 2e32282f4e622e620f8b940ab2a78947b7ea8ff9 for
-   artifact publishing.
-   
-   
-COMANCHE:
-    
+condorM30-0.7.0 is branched from hortonworks  comanche-0.7.0  SHA1 e3d65e8e4532d80f8565ca6c6894bc5e601bbba3 @  git@github.com:hortonworks/mahout.git 
