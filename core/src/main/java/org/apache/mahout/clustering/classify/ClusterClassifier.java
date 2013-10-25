@@ -65,7 +65,7 @@ import com.google.common.io.Closeables;
 public class ClusterClassifier extends AbstractVectorClassifier implements OnlineLearner, Writable {
   
   private static final String POLICY_FILE_NAME = "_policy";
-  
+  private static final String WINDOWS_OS = "Windows";
   private List<Cluster> models;
   
   private String modelClass;
@@ -205,6 +205,9 @@ public class ClusterClassifier extends AbstractVectorClassifier implements Onlin
   public void readFromSeqFiles(Configuration conf, Path path) throws IOException {
     Configuration config = new Configuration();
     List<Cluster> clusters = Lists.newArrayList();
+    if(System.getProperty("os.name").startsWith(WINDOWS_OS) && !(path.toString().startsWith("file:/") || path.toString().startsWith("hdfs:/"))){
+        path = new Path(conf.getRaw("fs.default.name") + path.toString());
+    }
     for (ClusterWritable cw : new SequenceFileDirValueIterable<ClusterWritable>(path, PathType.LIST,
         PathFilters.logsCRCFilter(), config)) {
       Cluster cluster = cw.getValue();

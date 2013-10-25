@@ -51,6 +51,7 @@ public class ClusterClassificationMapper extends
   private ClusterClassifier clusterClassifier;
   private IntWritable clusterId;
   private boolean emitMostLikely;
+  private static final String WINDOWS_OS = "Windows";
   
   @Override
   protected void setup(Context context) throws IOException, InterruptedException {
@@ -64,8 +65,14 @@ public class ClusterClassificationMapper extends
     clusterModels = Lists.newArrayList();
     
     if (clustersIn != null && !clustersIn.isEmpty()) {
-      Path clustersInPath = new Path(clustersIn);
-      clusterModels = populateClusterModels(clustersInPath, conf);
+        Path clustersInPath = null;
+        if(System.getProperty("os.name").startsWith(WINDOWS_OS) && !(clustersIn.startsWith("file:/") || clustersIn.startsWith("hdfs:/"))){
+            clustersInPath = new Path(conf.getRaw("fs.default.name") +  clustersIn);
+        }else{
+            clustersInPath = new Path(clustersIn);
+        }
+
+        clusterModels = populateClusterModels(clustersInPath, conf);
       ClusteringPolicy policy = ClusterClassifier
           .readPolicy(finalClustersPath(clustersInPath));
       clusterClassifier = new ClusterClassifier(clusterModels, policy);
