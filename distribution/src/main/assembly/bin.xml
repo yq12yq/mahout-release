@@ -18,6 +18,7 @@
       <excludes>
         <exclude>mahout-*</exclude>
         <exclude>hadoop-*</exclude>
+        <exclude>junit-*</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
     </fileSet>
@@ -26,6 +27,9 @@
       <includes>
         <include>mahout-collections*.jar</include>
       </includes>
+      <excludes>
+        <exclude>junit-*</exclude>
+      </excludes>
       <outputDirectory>lib</outputDirectory>
     </fileSet>
     <fileSet>
@@ -33,6 +37,9 @@
       <includes>
         <include>hadoop-*.jar</include>
       </includes>
+      <excludes>
+        <exclude>junit-*</exclude>
+      </excludes>
       <outputDirectory>lib/hadoop</outputDirectory>
     </fileSet>
     <fileSet>
