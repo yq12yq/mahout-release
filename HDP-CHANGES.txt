@@ -1,1 +1,1 @@
-git@github.com:hortonworks/mahout.git   @ bigwheel-GA-0.8.0 is branched from hortonworks  bighweel-beta2-0.8.0 (55ed1b8a46e1c60464219d312c9417f855479ab9)
+git@github.com:hortonworks/mahout.git   @ baikal-GA-0.9.0 is branched from hortonworks  bighweel-GA-0.8.0 (0e1072cf90a94a77a9c276f46c6dcbfeafec381e)
