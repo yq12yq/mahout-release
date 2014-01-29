@@ -21,14 +21,15 @@ import java.io.FileOutputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.google.common.io.Closeables;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterator;
-import org.apache.mahout.utils.MahoutTestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -98,7 +99,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     String expectedChunkPath = expectedChunkFile.getAbsolutePath();
     Assert.assertTrue("Expected chunk file " + expectedChunkPath + " not found!", expectedChunkFile.isFile());
 
-    Configuration conf = new Configuration();
+    Configuration conf = getConfiguration();
     SequenceFileIterator<Text, Text> iterator = new SequenceFileIterator<Text, Text>(new Path(expectedChunkPath), true, conf);
     Assert.assertTrue("First key/value pair not found!", iterator.hasNext());
     Pair<Text, Text> record = iterator.next();
@@ -129,14 +130,15 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
   @Test
   public void testMapReduce() throws Exception {
 
-    Path tmpDir = this.getTestTempDirPath();
+    Path tmpDir = getTestTempDirPath();
     Path mrOutputDir = new Path(tmpDir, "mail-archives-out-mr");
-    Configuration configuration = new Configuration();
+    Configuration configuration = getConfiguration();
     FileSystem fs = FileSystem.get(configuration);
 
     File expectedInputFile = new File(inputDir.toString());
 
     String[] args = {
+      "-Dhadoop.tmp.dir=" + configuration.get("hadoop.tmp.dir"),
       "--input", expectedInputFile.getAbsolutePath(),
       "--output", mrOutputDir.toString(),
       "--charset", "UTF-8",

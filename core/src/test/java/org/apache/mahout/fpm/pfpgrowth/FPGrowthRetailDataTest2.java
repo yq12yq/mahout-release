@@ -29,13 +29,11 @@ import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.iterator.FileLineIterable;
 import org.apache.mahout.common.iterator.StringRecordIterator;
-import org.apache.mahout.fpm.pfpgrowth.convertors.StatusUpdater;
 import org.apache.mahout.fpm.pfpgrowth.fpgrowth2.FPGrowthObj;
 import org.junit.Test;
 
 import com.google.common.io.Resources;
 
-@Deprecated
 public final class FPGrowthRetailDataTest2 extends MahoutTestCase {
 
   @Test
@@ -76,10 +74,6 @@ public final class FPGrowthRetailDataTest2 extends MahoutTestCase {
           }
         }
         
-      }, new StatusUpdater() {
-        
-        @Override
-        public void update(String status) {}
       });
     
     assertEquals(Long.valueOf(pattern_41_36_39), results.get(returnableFeatures));

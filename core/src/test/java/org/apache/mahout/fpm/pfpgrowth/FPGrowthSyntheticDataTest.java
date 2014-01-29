@@ -38,7 +38,6 @@ import org.junit.Test;
 
 import com.google.common.io.Resources;
 
-@Deprecated
 public final class FPGrowthSyntheticDataTest extends MahoutTestCase {
 
   @Test
@@ -97,11 +96,7 @@ public final class FPGrowthSyntheticDataTest extends MahoutTestCase {
                                         }
                                       }
         
-                                    }, new StatusUpdater() {
-        
-                                        @Override
-                                          public void update(String status) {}
-                                      });
+                                    });
 
     assertEquals(patternCnt_10_13, highestSupport(results, features_10_13));
     assertEquals(patternCnt_10_13_1669, highestSupport(results, returnableFeatures));
@@ -192,11 +187,7 @@ public final class FPGrowthSyntheticDataTest extends MahoutTestCase {
                                          }
                                        }
         
-                                     }, new StatusUpdater() {
-        
-                                         @Override
-                                           public void update(String status) {}
-                                       });
+                                     });
 
     Map<Set<String>, Long> results2;
     if (returnableFeatures.isEmpty()) {

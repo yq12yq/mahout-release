@@ -18,7 +18,7 @@
       <excludes>
         <exclude>mahout-*</exclude>
         <exclude>hadoop-*</exclude>
-        <exclude>junit-*</exclude>
+		    <exclude>junit-*</exclude>
       </excludes>
       <outputDirectory>lib</outputDirectory>
     </fileSet>
@@ -124,7 +124,7 @@
         <include>**/*.properties</include>
       </includes>
       <excludes>
-        <exclude>target/**</exclude>
+        <exclude>**/target/**</exclude>
       </excludes>
     </fileSet>
     <fileSet>
@@ -134,6 +134,7 @@
         <include>mahout</include>
       </includes>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
       <directory>${project.basedir}/../src/conf</directory>
@@ -145,6 +146,7 @@
       <directory>${project.basedir}/../examples/bin</directory>
       <outputDirectory>examples/bin</outputDirectory>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
       <excludes>
         <exclude>work</exclude>
         <exclude>work/**</exclude>

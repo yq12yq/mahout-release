@@ -27,10 +27,11 @@ import java.util.Map;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
-import org.apache.mahout.utils.MahoutTestCase;
 import org.junit.Test;
 
 public final class ARFFVectorIterableTest extends MahoutTestCase {
@@ -123,7 +124,7 @@ public final class ARFFVectorIterableTest extends MahoutTestCase {
     assertEquals(1, nominalMap.size());
     Map<String, Integer> noms = nominalMap.get("bar");
     assertNotNull("nominals for bar are null", noms);
-    assertEquals(2, noms.size());
+    assertEquals(5, noms.size());
     Map<Integer, ARFFType> integerARFFTypeMap = model.getTypeMap();
     assertNotNull("Type map null", integerARFFTypeMap);
     assertEquals(5, integerARFFTypeMap.size());
@@ -188,7 +189,7 @@ public final class ARFFVectorIterableTest extends MahoutTestCase {
     assertEquals(1, nominalMap.size());
     Map<String,Integer> noms = nominalMap.get("bar");
     assertNotNull("nominals for bar are null", noms);
-    assertEquals(2, noms.size());
+    assertEquals(5, noms.size());
     Map<Integer,ARFFType> integerARFFTypeMap = model.getTypeMap();
     assertNotNull("Type map null", integerARFFTypeMap);
     assertEquals(5, integerARFFTypeMap.size());

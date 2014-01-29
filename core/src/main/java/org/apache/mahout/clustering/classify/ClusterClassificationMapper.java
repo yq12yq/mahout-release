@@ -20,22 +20,28 @@ package org.apache.mahout.clustering.classify;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.mahout.clustering.Cluster;
 import org.apache.mahout.clustering.iterator.ClusterWritable;
 import org.apache.mahout.clustering.iterator.ClusteringPolicy;
+import org.apache.mahout.clustering.iterator.DistanceMeasureCluster;
+import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.common.iterator.sequencefile.PathFilters;
 import org.apache.mahout.common.iterator.sequencefile.PathType;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileDirValueIterator;
+import org.apache.mahout.math.NamedVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.Vector.Element;
 import org.apache.mahout.math.VectorWritable;
@@ -87,13 +93,24 @@ public class ClusterClassificationMapper extends
   protected void map(WritableComparable<?> key, VectorWritable vw, Context context)
     throws IOException, InterruptedException {
     if (!clusterModels.isEmpty()) {
-      Vector pdfPerCluster = clusterClassifier.classify(vw.get());
+      // Converting to NamedVectors to preserve the vectorId else its not obvious as to which point
+      // belongs to which cluster - fix for MAHOUT-1410
+      Class<? extends Vector> vectorClass = vw.get().getClass();
+      Vector vector = vw.get();
+      if (!vectorClass.equals(NamedVector.class)) {
+        if (key.getClass().equals(Text.class)) {
+          vector = new NamedVector(vector, key.toString());
+        } else if (key.getClass().equals(IntWritable.class)) {
+          vector = new NamedVector(vector, Integer.toString(((IntWritable) key).get()));
+        }
+      }
+      Vector pdfPerCluster = clusterClassifier.classify(vector);
       if (shouldClassify(pdfPerCluster)) {
         if (emitMostLikely) {
           int maxValueIndex = pdfPerCluster.maxValueIndex();
-          write(vw, context, maxValueIndex, 1.0);
+          write(new VectorWritable(vector), context, maxValueIndex, 1.0);
         } else {
-          writeAllAboveThreshold(vw, context, pdfPerCluster);
+          writeAllAboveThreshold(new VectorWritable(vector), context, pdfPerCluster);
         }
       }
     }
@@ -113,7 +130,14 @@ public class ClusterClassificationMapper extends
     throws IOException, InterruptedException {
     Cluster cluster = clusterModels.get(clusterIndex);
     clusterId.set(cluster.getId());
-    context.write(clusterId, new WeightedVectorWritable(weight, vw.get()));
+
+    DistanceMeasureCluster distanceMeasureCluster = (DistanceMeasureCluster) cluster;
+    DistanceMeasure distanceMeasure = distanceMeasureCluster.getMeasure();
+    double distance = distanceMeasure.distance(cluster.getCenter(), vw.get());
+
+    Map<Text, Text> props = Maps.newHashMap();
+    props.put(new Text("distance"), new Text(Double.toString(distance)));
+    context.write(clusterId, new WeightedPropertyVectorWritable(weight, vw.get(), props));
   }
   
   public static List<Cluster> populateClusterModels(Path clusterOutputPath, Configuration conf) throws IOException {

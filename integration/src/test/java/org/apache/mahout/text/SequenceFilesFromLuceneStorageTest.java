@@ -16,6 +16,7 @@
  */
 package org.apache.mahout.text;
 
+import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -33,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -46,10 +46,9 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
   private Path seqFilesOutputPath;
   private Configuration configuration;
 
-  @SuppressWarnings("unchecked")
   @Before
   public void before() throws IOException {
-    configuration = new Configuration();
+    configuration = getConfiguration();
     seqFilesOutputPath = new Path(getTestTempDirPath(), "seqfiles");
 
     lucene2Seq = new SequenceFilesFromLuceneStorage();
@@ -80,7 +79,7 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
     lucene2Seq.run(lucene2SeqConf);
 
     Iterator<Pair<Text, Text>> iterator = lucene2SeqConf.getSequenceFileIterator();
-    Map<String, Text> map = new HashMap<String, Text>();
+    Map<String, Text> map = Maps.newHashMap();
     while (iterator.hasNext()) {
       Pair<Text, Text> next = iterator.next();
       map.put(next.getFirst().toString(), next.getSecond());
@@ -98,7 +97,6 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testRunSkipUnstoredFields() throws IOException {
     commitDocuments(getDirectory(getIndexPath1AsFile()), new UnstoredFieldsDocument("5", "This is test document 5"));
@@ -117,7 +115,6 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
     assertFalse(iterator.hasNext());
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testRunMaxHits() throws IOException {
     commitDocuments(getDirectory(getIndexPath1AsFile()), docs.subList(0, 500));
@@ -139,7 +136,6 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
     assertFalse(iterator.hasNext());
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testRunQuery() throws IOException {
     commitDocuments(getDirectory(getIndexPath1AsFile()), docs);
@@ -147,7 +143,7 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
       asList(getIndexPath1()),
       seqFilesOutputPath,
       SingleFieldDocument.ID_FIELD,
-      asList(UnstoredFieldsDocument.FIELD, UnstoredFieldsDocument.UNSTORED_FIELD));
+      asList(SingleFieldDocument.FIELD));
 
     Query query = new TermQuery(new Term(lucene2SeqConf.getFields().get(0), "599"));
 
@@ -204,5 +200,31 @@ public class SequenceFilesFromLuceneStorageTest extends AbstractLuceneStorageTes
     assertNumericFieldEquals(doc1, iterator.next());
     assertNumericFieldEquals(doc2, iterator.next());
     assertNumericFieldEquals(doc3, iterator.next());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNonExistingIdField() throws IOException {
+    commitDocuments(getDirectory(getIndexPath1AsFile()), docs.subList(0, 500));
+
+    lucene2SeqConf = new LuceneStorageConfiguration(configuration,
+        asList(getIndexPath1()),
+        seqFilesOutputPath,
+        "nonExistingField",
+        asList(SingleFieldDocument.FIELD));
+
+    lucene2Seq.run(lucene2SeqConf);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNonExistingField() throws IOException {
+    commitDocuments(getDirectory(getIndexPath1AsFile()), docs.subList(0, 500));
+
+    lucene2SeqConf = new LuceneStorageConfiguration(configuration,
+        asList(getIndexPath1()),
+        seqFilesOutputPath,
+        SingleFieldDocument.ID_FIELD,
+        asList(SingleFieldDocument.FIELD, "nonExistingField"));
+
+    lucene2Seq.run(lucene2SeqConf);
   }
 }

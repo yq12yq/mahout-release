@@ -26,7 +26,6 @@ import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.RandomUtils;
 import org.junit.Test;
 
-@Deprecated
 public final class FrequentPatternMaxHeapTest extends MahoutTestCase {
 
   @Test

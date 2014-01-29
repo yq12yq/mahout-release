@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 
-@Deprecated
 public class PFPGrowthRetailDataTest extends MahoutTestCase {
   
   private final Parameters params = new Parameters();
@@ -55,7 +54,7 @@ public class PFPGrowthRetailDataTest extends MahoutTestCase {
   public void setUp() throws Exception {
     super.setUp();
     params.set(PFPGrowth.MIN_SUPPORT, "100");
-    params.set(PFPGrowth.MAX_HEAPSIZE, "10000");
+    params.set(PFPGrowth.MAX_HEAP_SIZE, "10000");
     params.set(PFPGrowth.NUM_GROUPS, "50");
     params.set(PFPGrowth.ENCODING, "UTF-8");
     File inputDir = getTestTempDir("transactions");
@@ -159,7 +158,7 @@ public class PFPGrowthRetailDataTest extends MahoutTestCase {
       expectedResults.put(Sets.newHashSet(items), support);
     }
     Configuration conf = getConfiguration();
-    log.info("Starting Parallel Counting Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Starting Parallel Counting Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     PFPGrowth.startParallelCounting(params, conf);
 
     List<Pair<String,Long>> fList = PFPGrowth.readFList(params);
@@ -173,7 +172,7 @@ public class PFPGrowthRetailDataTest extends MahoutTestCase {
     params.set(PFPGrowth.MAX_PER_GROUP, Integer.toString(maxPerGroup));
 
     PFPGrowth.startParallelFPGrowth(params, conf);
-    log.info("Starting Pattern Aggregation Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Starting Pattern Aggregation Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     PFPGrowth.startAggregating(params, conf);
     List<Pair<String,TopKStringPatterns>> frequentPatterns = PFPGrowth.readFrequentPattern(params);
     

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-@Deprecated
 public class LeastKCache<K extends Comparable<? super K>,V> {
   
   private final int capacity;

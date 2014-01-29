@@ -29,7 +29,6 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.mahout.common.Pair;
-import org.apache.mahout.fpm.pfpgrowth.convertors.StatusUpdater;
 import org.apache.mahout.fpm.pfpgrowth.convertors.TopKPatternsOutputConverter;
 import org.apache.mahout.math.list.LongArrayList;
 import org.apache.mahout.math.list.IntArrayList;
@@ -42,7 +41,6 @@ import  org.apache.mahout.fpm.pfpgrowth.fpgrowth.FrequentPatternMaxHeap;
 /**
  * Implementation of PFGrowth Algorithm
  */
-@Deprecated
 public final class FPGrowthIds {
 
   private static final Logger log = LoggerFactory.getLogger(FPGrowthIds.class);
@@ -54,30 +52,30 @@ public final class FPGrowthIds {
    * Generate Top K Frequent Patterns for every feature in returnableFeatures
    * given a stream of transactions and the minimum support
    *
-   * @param transactionStream
-   *          Iterator of transaction
-   * @param attributeFrequency
-   *          list of frequent features and their support value
-   * @param minSupport
-   *          minimum support of the transactions
-   * @param k
-   *          Number of top frequent patterns to keep
-   * @param returnableFeatures
-   *          set of features for which the frequent patterns are mined. If the
-   *          set is empty or null, then top K patterns for every frequent item (an item
-   *          whose support> minSupport) is generated
-   * @param output
-   *          The output collector to which the the generated patterns are
-   *          written
-   * @throws IOException
+   *
+  * @param transactionStream
+  *          Iterator of transaction
+  * @param attributeFrequency
+  *          list of frequent features and their support value
+  * @param minSupport
+  *          minimum support of the transactions
+  * @param k
+  *          Number of top frequent patterns to keep
+  * @param returnableFeatures
+  *          set of features for which the frequent patterns are mined. If the
+  *          set is empty or null, then top K patterns for every frequent item (an item
+  *          whose support> minSupport) is generated
+  * @param output
+  *          The output collector to which the the generated patterns are
+  *          written
+  * @throws IOException
    */
   public static void generateTopKFrequentPatterns(Iterator<Pair<IntArrayList, Long>> transactionStream,
                                                   LongArrayList attributeFrequency,
                                                   long minSupport,
                                                   int k,
                                                   IntArrayList returnableFeatures,
-                                                  OutputCollector<Integer, List<Pair<List<Integer>, Long>>> output,
-                                                  StatusUpdater updater) throws IOException {
+                                                  OutputCollector<Integer, List<Pair<List<Integer>, Long>>> output) throws IOException {
 
     for (int i = 0; i < attributeFrequency.size(); i++) {
       if (attributeFrequency.get(i) < minSupport) {
@@ -99,7 +97,7 @@ public final class FPGrowthIds {
     log.info("Number of unique pruned items {}", attributeFrequency.size());
     generateTopKFrequentPatterns(transactionStream, attributeFrequency,
         minSupport, k, returnableFeatures,
-        new TopKPatternsOutputConverter<Integer>(output, new IdentityMapping()), updater);
+        new TopKPatternsOutputConverter<Integer>(output, new IdentityMapping()));
   }
 
   private static class IdentityMapping extends AbstractMap<Integer, Integer> {
@@ -119,6 +117,7 @@ public final class FPGrowthIds {
   /**
    * Top K FpGrowth Algorithm
    *
+   *
    * @param tree
    *          to be mined
    * @param minSupportValue
@@ -136,8 +135,7 @@ public final class FPGrowthIds {
                                                               long minSupportValue,
                                                               int k,
                                                               IntArrayList requiredFeatures,
-                                                              TopKPatternsOutputConverter<Integer> outputCollector,
-                                                              StatusUpdater updater) throws IOException {
+                                                              TopKPatternsOutputConverter<Integer> outputCollector) throws IOException {
 
     Map<Integer,FrequentPatternMaxHeap> patterns = Maps.newHashMap();
     requiredFeatures.sort();
@@ -146,7 +144,7 @@ public final class FPGrowthIds {
         log.info("Mining FTree Tree for all patterns with {}", attribute);
         MutableLong minSupport = new MutableLong(minSupportValue);
         FrequentPatternMaxHeap frequentPatterns = growth(tree, minSupport, k,
-                                                         attribute, updater);
+                                                         attribute);
         patterns.put(attribute, frequentPatterns);
         outputCollector.collect(attribute, frequentPatterns);
 
@@ -169,14 +167,13 @@ public final class FPGrowthIds {
    * @param attributeFrequency
    *          array representing the Frequency of the corresponding attribute id
    * @param minSupport
-   *          minimum support of the pattern to be mined
+ *          minimum support of the pattern to be mined
    * @param k
-   *          Max value of the Size of the Max-Heap in which Patterns are held
+*          Max value of the Size of the Max-Heap in which Patterns are held
    * @param returnFeatures
-   *          the id's of the features for which Top K patterns have to be mined
+*          the id's of the features for which Top K patterns have to be mined
    * @param topKPatternsOutputCollector
-   *          the outputCollector which transforms the given Pattern in integer
-   *          format to the corresponding A Format
+*          the outputCollector which transforms the given Pattern in integer
    */
   private static void generateTopKFrequentPatterns(
       Iterator<Pair<IntArrayList, Long>> transactions,
@@ -184,8 +181,7 @@ public final class FPGrowthIds {
       long minSupport,
       int k,
       IntArrayList returnFeatures,
-      TopKPatternsOutputConverter<Integer> topKPatternsOutputCollector,
-      StatusUpdater updater) throws IOException {
+      TopKPatternsOutputConverter<Integer> topKPatternsOutputCollector) throws IOException {
 
     FPTree tree = new FPTree(attributeFrequency, minSupport);
 
@@ -201,7 +197,7 @@ public final class FPGrowthIds {
       }
     }
 
-    fpGrowth(tree, minSupport, k, returnFeatures, topKPatternsOutputCollector, updater);
+    fpGrowth(tree, minSupport, k, returnFeatures, topKPatternsOutputCollector);
   }
 
   /** 
@@ -210,8 +206,7 @@ public final class FPGrowthIds {
   private static FrequentPatternMaxHeap growth(FPTree tree,
                                                MutableLong minSupportMutable,
                                                int k,
-                                               int currentAttribute,
-                                               StatusUpdater updater) {
+                                               int currentAttribute) {
 
     long currentAttributeCount = tree.headerCount(currentAttribute);
 
@@ -238,7 +233,7 @@ public final class FPGrowthIds {
 
     for (int attr : q.attrIterableRev())  {
       mergeHeap(suffixPats,
-                growth(q, minSupportMutable, k, attr, updater),
+                growth(q, minSupportMutable, k, attr),
                 currentAttribute,
                 currentAttributeCount, true);
     }

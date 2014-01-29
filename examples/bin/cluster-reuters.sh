@@ -39,7 +39,7 @@ if [ ! -e $MAHOUT ]; then
   exit 1
 fi
 
-algorithm=( kmeans fuzzykmeans dirichlet lda minhash)
+algorithm=( kmeans fuzzykmeans lda streamingkmeans)
 if [ -n "$1" ]; then
   choice=$1
 else
@@ -47,8 +47,7 @@ else
   echo "1. ${algorithm[0]} clustering"
   echo "2. ${algorithm[1]} clustering"
   echo "3. ${algorithm[2]} clustering"
-  echo "4. ${algorithm[3]} clustering" 
-  echo "5. ${algorithm[4]} clustering"
+  echo "4. ${algorithm[3]} clustering"
   read -p "Enter your choice : " choice
 fi
 
@@ -103,7 +102,7 @@ if [ ! -e ${WORK_DIR}/reuters-out-seqdir ]; then
     fi
   fi
   echo "Converting to Sequence Files from Directory"
-  $MAHOUT seqdirectory -i ${WORK_DIR}/reuters-out -o ${WORK_DIR}/reuters-out-seqdir -c UTF-8 -chunk 5
+  $MAHOUT seqdirectory -i ${WORK_DIR}/reuters-out -o ${WORK_DIR}/reuters-out-seqdir -c UTF-8 -chunk 64 -xm sequential
 fi
 
 if [ "x$clustertype" == "xkmeans" ]; then
@@ -145,25 +144,6 @@ elif [ "x$clustertype" == "xfuzzykmeans" ]; then
     -dt sequencefile -b 100 -n 20 -sp 0 \
     && \
   cat ${WORK_DIR}/reuters-fkmeans/clusterdump
-elif [ "x$clustertype" == "xdirichlet" ]; then
-  $MAHOUT seq2sparse \
-    -i ${WORK_DIR}/reuters-out-seqdir/ \
-    -o ${WORK_DIR}/reuters-out-seqdir-sparse-dirichlet  --maxDFPercent 85 --namedVector \
-  && \
-  $MAHOUT dirichlet \
-    -i ${WORK_DIR}/reuters-out-seqdir-sparse-dirichlet/tfidf-vectors \
-    -o ${WORK_DIR}/reuters-dirichlet -k 20 -ow -x 20 -a0 2 \
-    -md org.apache.mahout.clustering.dirichlet.models.DistanceMeasureClusterDistribution \
-    -mp org.apache.mahout.math.DenseVector \
-    -dm org.apache.mahout.common.distance.CosineDistanceMeasure \
-  && \
-  $MAHOUT clusterdump \
-    -i ${WORK_DIR}/reuters-dirichlet/clusters-*-final \
-    -o ${WORK_DIR}/reuters-dirichlet/clusterdump \
-    -d ${WORK_DIR}/reuters-out-seqdir-sparse-dirichlet/dictionary.file-0 \
-    -dt sequencefile -b 100 -n 20 -sp 0 \
-    && \
-  cat ${WORK_DIR}/reuters-dirichlet/clusterdump
 elif [ "x$clustertype" == "xlda" ]; then
   $MAHOUT seq2sparse \
     -i ${WORK_DIR}/reuters-out-seqdir/ \
@@ -190,14 +170,27 @@ elif [ "x$clustertype" == "xlda" ]; then
     -dt sequencefile -sort ${WORK_DIR}/reuters-lda-topics/part-m-00000 \
     && \
   cat ${WORK_DIR}/reuters-lda/vectordump
-elif [ "x$clustertype" == "xminhash" ]; then
+elif [ "x$clustertype" == "xstreamingkmeans" ]; then
   $MAHOUT seq2sparse \
     -i ${WORK_DIR}/reuters-out-seqdir/ \
-    -o ${WORK_DIR}/reuters-out-seqdir-sparse-minhash --maxDFPercent 85 --namedVector \
+    -o ${WORK_DIR}/reuters-out-seqdir-sparse-streamingkmeans -ow --maxDFPercent 85 --namedVector \
   && \
-  $MAHOUT org.apache.mahout.clustering.minhash.MinHashDriver \
-    -i ${WORK_DIR}/reuters-out-seqdir-sparse-minhash/tfidf-vectors \
-    -o ${WORK_DIR}/reuters-minhash --overwrite
+  rm -rf ${WORK_DIR}/reuters-streamingkmeans \
+  && \
+  $MAHOUT streamingkmeans \
+    -i ${WORK_DIR}/reuters-out-seqdir-sparse-streamingkmeans/tfidf-vectors/ \
+    --tempDir ${WORK_DIR}/tmp \
+    -o ${WORK_DIR}/reuters-streamingkmeans \
+    -sc org.apache.mahout.math.neighborhood.FastProjectionSearch \
+    -dm org.apache.mahout.common.distance.SquaredEuclideanDistanceMeasure \
+    -k 10 -km 100 -ow \
+  && \
+  $MAHOUT qualcluster \
+    -i ${WORK_DIR}/reuters-out-seqdir-sparse-streamingkmeans/tfidf-vectors/part-r-00000 \
+    -c ${WORK_DIR}/reuters-streamingkmeans/part-r-00000   \
+    -o ${WORK_DIR}/reuters-cluster-distance.csv \
+    && \
+  cat ${WORK_DIR}/reuters-cluster-distance.csv
 else 
   echo "unknown cluster type: $clustertype"
 fi 

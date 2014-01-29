@@ -30,20 +30,24 @@ import org.apache.mahout.common.iterator.sequencefile.SequenceFileValueIterable;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.VectorWritable;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamingKMeansThread implements Callable<Iterable<Centroid>> {
+  private static final Logger log = LoggerFactory.getLogger(StreamingKMeansThread.class);
+
   private static final int NUM_ESTIMATE_POINTS = 1000;
 
   private final Configuration conf;
-  private final Iterable<Centroid> datapoints;
+  private final Iterable<Centroid> dataPoints;
 
   public StreamingKMeansThread(Path input, Configuration conf) {
     this(StreamingKMeansUtilsMR.getCentroidsFromVectorWritable(
         new SequenceFileValueIterable<VectorWritable>(input, false, conf)), conf);
   }
 
-  public StreamingKMeansThread(Iterable<Centroid> datapoints, Configuration conf) {
-    this.datapoints = datapoints;
+  public StreamingKMeansThread(Iterable<Centroid> dataPoints, Configuration conf) {
+    this.dataPoints = dataPoints;
     this.conf = conf;
   }
 
@@ -54,22 +58,35 @@ public class StreamingKMeansThread implements Callable<Iterable<Centroid>> {
     double estimateDistanceCutoff = conf.getFloat(StreamingKMeansDriver.ESTIMATED_DISTANCE_CUTOFF,
         StreamingKMeansDriver.INVALID_DISTANCE_CUTOFF);
 
-    Iterator<Centroid> datapointsIterator = datapoints.iterator();
+    Iterator<Centroid> dataPointsIterator = dataPoints.iterator();
+
     if (estimateDistanceCutoff == StreamingKMeansDriver.INVALID_DISTANCE_CUTOFF) {
       List<Centroid> estimatePoints = Lists.newArrayListWithExpectedSize(NUM_ESTIMATE_POINTS);
-      while (datapointsIterator.hasNext() && estimatePoints.size() < NUM_ESTIMATE_POINTS) {
-        estimatePoints.add(datapointsIterator.next());
+      while (dataPointsIterator.hasNext() && estimatePoints.size() < NUM_ESTIMATE_POINTS) {
+        Centroid centroid = dataPointsIterator.next();
+        estimatePoints.add(centroid);
+      }
+
+      if (log.isInfoEnabled()) {
+        log.info("Estimated Points: {}", estimatePoints.size());
       }
       estimateDistanceCutoff = ClusteringUtils.estimateDistanceCutoff(estimatePoints, searcher.getDistanceMeasure());
     }
 
-    StreamingKMeans clusterer = new StreamingKMeans(searcher, numClusters, estimateDistanceCutoff);
-    while (datapointsIterator.hasNext()) {
-      clusterer.cluster(datapointsIterator.next());
-    }
-    clusterer.reindexCentroids();
+    StreamingKMeans streamingKMeans = new StreamingKMeans(searcher, numClusters, estimateDistanceCutoff);
 
-    return clusterer;
+    // datapointsIterator could be empty if no estimate distance was initially provided
+    // hence creating the iterator again here for the clustering
+    if (!dataPointsIterator.hasNext()) {
+      dataPointsIterator = dataPoints.iterator();
+    }
+
+    while (dataPointsIterator.hasNext()) {
+      streamingKMeans.cluster(dataPointsIterator.next());
+    }
+
+    streamingKMeans.reindexCentroids();
+    return streamingKMeans;
   }
 
 }

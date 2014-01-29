@@ -40,7 +40,6 @@ import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Deprecated
 public final class FPGrowthRetailDataTestVs extends MahoutTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(PFPGrowthRetailDataTestVs.class);
@@ -120,7 +119,7 @@ public final class FPGrowthRetailDataTestVs extends MahoutTestCase {
       fp2.generateFList(new StringRecordIterator(new FileLineIterable(Resources.getResource(inputFilename)
            .openStream()), "\\s+"), minSupport), minSupport, 100000,
         Sets.<String>newHashSet(),
-      new MapCollector(initialResults2), new DummyUpdater());
+      new MapCollector(initialResults2));
 
     Map<Set<String>, Long> results2;
     if (returnableFeatures.isEmpty()) {

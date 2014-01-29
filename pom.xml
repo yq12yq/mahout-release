@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mahout</groupId>
   <artifactId>mahout</artifactId>
-  <version>0.8</version>
+  <version>1.0-SNAPSHOT</version>
 
   <parent>
     <groupId>org.apache</groupId>
@@ -99,12 +99,13 @@
     <maven.compiler.target>1.6</maven.compiler.target>
     <maven.clover.multiproject>true</maven.clover.multiproject>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <msurefire.version>2.15</msurefire.version>
+    <msurefire.version>2.16</msurefire.version>
     <mpmd.version>3.0.1</mpmd.version>
     <mcheckstyle.version>2.10</mcheckstyle.version>
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
-    <lucene.version>4.3.0</lucene.version>
+    <lucene.version>4.6.1</lucene.version>
+    <slf4j.version>1.7.5</slf4j.version>
     <hadoop.2.version>2.1.0</hadoop.2.version>
     <hadoop.1.version>1.1.2</hadoop.1.version>
     <hbase.version>0.95.0</hbase.version>
@@ -167,18 +168,21 @@
         <artifactId>mahout-integration</artifactId>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
+        <optional>true</optional>
       </dependency>
 
       <dependency>
         <artifactId>mahout-buildtools</artifactId>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
+        <optional>true</optional>
       </dependency>
 
       <dependency>
         <artifactId>mahout-examples</artifactId>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
+        <optional>true</optional>
       </dependency>
 
       <!-- 3rd party  -->
@@ -205,11 +209,29 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>3.1</version>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-all</artifactId>
+        <version>1.3</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>3.2</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.carrotsearch.randomizedtesting</groupId>
+        <artifactId>randomizedtesting-runner</artifactId>
+        <version>2.0.15</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.lucene</groupId>
+        <artifactId>lucene-test-framework</artifactId>
+        <version>${lucene.version}</version>
+        <scope>test</scope>
+       </dependency>
 
         <dependency>
         <groupId>org.codehaus.jackson</groupId>
@@ -235,21 +257,44 @@
       </dependency>
 
       <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.4</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.5</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-jcl</artifactId>
-        <version>1.7.5</version>
+        <version>${slf4j.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.4</version>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
       </dependency>
 
       <dependency>
@@ -273,7 +318,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>14.0.1</version>
+        <version>16.0</version>
       </dependency>
 
       <dependency>
@@ -305,7 +350,7 @@
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <versionRange>2.7</versionRange>
+                    <versionRange>2.8</versionRange>
                     <goals>
                       <goal>copy-dependencies</goal>
                     </goals>
@@ -371,12 +416,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.7</version>
+          <version>2.8</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.4</version>
+          <version>2.5.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -488,6 +533,20 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <forkCount>1.5C</forkCount>
+          <reuseForks>false</reuseForks>
+          <argLine>-Xmx512m</argLine>
+          <testFailureIgnore>false</testFailureIgnore>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+          <systemPropertyVariables>
+            <mahout.test.directory>${project.build.directory}</mahout.test.directory>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
         <inherited>false</inherited>
         <configuration>
@@ -502,7 +561,7 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.11.1</version>
+        <version>3.1.12</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -556,11 +615,49 @@
           <effort>Default</effort>
           <!--visitors>FindDeadLocalStores,UnreadFields</visitors-->
           <!--omitVisitors>FindDeadLocalStores,UnreadFields</omitVisitors-->
-          <debug>true</debug>
           <relaxed>true</relaxed>
           <!-- classpath -->
           <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
           <failOnError>false</failOnError>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.10</version>
+        <configuration>
+          <licenses>
+            <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+              <patterns>
+                <note>CERN license for Colt -- basically only requires attribution</note>
+                <pattern>1999 CERN - European Organization for Nuclear Research</pattern>
+              </patterns>
+            </license>
+            <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+              <patterns>
+                <pattern>public domain</pattern>
+              </patterns>
+            </license>
+          </licenses>
+          <excludes>
+            <exclude>**/*.conf</exclude>
+            <exclude>**/*.iml</exclude>
+            <exclude>**/*.md</exclude>
+            <exclude>**/*.props</exclude>
+            <exclude>**/gen/**</exclude>
+            <exclude>**/resources/**</exclude>
+            <exclude>**/images/**</exclude>
+            <exclude>**/target/**</exclude>
+            <exclude>**/testdata/**</exclude>
+            <exclude>**/.idea/**</exclude>
+            <exclude>**/package-info.java</exclude>
+            <exclude>**/.git/**</exclude>
+            <exclude>**/.classpath</exclude>
+            <exclude>**/.project</exclude>
+            <exclude>**/.settings/**</exclude>
+            <exclude>**/*.patch</exclude>
+          </excludes>
+          <excludeSubProjects>false</excludeSubProjects>
         </configuration>
       </plugin>
     </plugins>
@@ -578,6 +675,7 @@
     <module>integration</module>
     <module>examples</module>
     <module>distribution</module>
+    <module>math-scala</module>
   </modules>
   <profiles>
       <profile>
@@ -984,22 +1082,46 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <property>
+          <name>env.JENKINS_URL</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>remove-old-mahout-artifacts</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>remove-project-artifact</goal>
+                </goals>
+                <configuration>
+                  <failOnError>false</failOnError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
   <scm>
-    <connection>scm:svn:https://svn.apache.org/repos/asf/mahout/tags/mahout-0.8</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mahout/tags/mahout-0.8</developerConnection>
-    <url>https://svn.apache.org/repos/asf/mahout/tags/mahout-0.8</url>
+    <connection>scm:svn:https://svn.apache.org/repos/asf/mahout/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/mahout/trunk</developerConnection>
+    <url>https://svn.apache.org/repos/asf/mahout</url>
   </scm>
   <distributionManagement>
     <site>
       <id>Website</id>
-      <url>${site_url}</url>
+      <url>scp://people.apache.org/home/isabel/public_html/mahout_site</url>
     </site>
-    <repository>
-      <id>${repoid}</id>
-      <name>${reponame}</name>
-      <url>${repourl}</url>
-    </repository>
   </distributionManagement>
   <reporting>
     <plugins>
@@ -1007,7 +1129,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>${surefire.version}</version>
+        <version>${msurefire.version}</version>
       </plugin>
       <!-- checkstyle -->
       <plugin>
@@ -1024,7 +1146,7 @@
       <plugin>
         <groupId>com.atlassian.maven.plugins</groupId>
         <artifactId>maven-clover2-plugin</artifactId>
-        <version>3.1.10.1</version>
+        <version>3.1.12</version>
         <configuration>
           <generateHistorical>true</generateHistorical>
           <licenseLocation>buildtools/clover.license</licenseLocation>
@@ -1104,7 +1226,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
+        <version>2.7</version>
         <reportSets>
           <reportSet>
             <reports>

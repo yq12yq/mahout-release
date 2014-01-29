@@ -55,7 +55,6 @@ import org.apache.mahout.math.list.IntArrayList;
  * http://infolab.stanford.edu/~echang/recsys08-69.pdf
  * 
  */
-@Deprecated
 public final class PFPGrowth {
   
   public static final String ENCODING = "encoding";
@@ -65,11 +64,11 @@ public final class PFPGrowth {
   public static final String MAX_PER_GROUP = "maxPerGroup";
   public static final String OUTPUT = "output";
   public static final String MIN_SUPPORT = "minSupport";
-  public static final String MAX_HEAPSIZE = "maxHeapSize";
+  public static final String MAX_HEAP_SIZE = "maxHeapSize";
   public static final String INPUT = "input";
   public static final String PFP_PARAMETERS = "pfp.parameters";
   public static final String FILE_PATTERN = "part-*";
-  public static final String FPGROWTH = "fpgrowth";
+  public static final String FP_GROWTH = "fpgrowth";
   public static final String FREQUENT_PATTERNS = "frequentpatterns";
   public static final String PARALLEL_COUNTING = "parallelcounting";
   public static final String SPLIT_PATTERN = "splitPattern";
@@ -161,9 +160,7 @@ public final class PFPGrowth {
     return itemId / maxPerGroup;
   }
 
-  public static IntArrayList getGroupMembers(int groupId, 
-                                                   int maxPerGroup, 
-                                                   int numFeatures) {
+  public static IntArrayList getGroupMembers(int groupId, int maxPerGroup, int numFeatures) {
     int start = groupId * maxPerGroup;
     int end = start + maxPerGroup;
     if (end > numFeatures) {
@@ -197,14 +194,12 @@ public final class PFPGrowth {
   }
   
   /**
-   * @throws ClassNotFoundException 
- * @throws InterruptedException 
- * @throws IOException 
- * @params
-   *    input, output locations, additional parameters like minSupport(3), maxHeapSize(50), numGroups(1000)
-   * @conf
-   *    initial Hadoop configuration to use.
-   * 
+   * @param params params
+   * @param conf Configuration
+   * @throws ClassNotFoundException
+   * @throws InterruptedException
+   * @throws IOException
+   *
    * */
   public static void runPFPGrowth(Parameters params, Configuration conf) throws IOException,
                                                                         InterruptedException,
@@ -253,7 +248,7 @@ public final class PFPGrowth {
     conf.set("mapred.compress.map.output", "true");
     conf.set("mapred.output.compression.type", "BLOCK");
     
-    Path input = new Path(params.get(OUTPUT), FPGROWTH);
+    Path input = new Path(params.get(OUTPUT), FP_GROWTH);
     Job job = new Job(conf, "PFP Aggregator Driver running over input: " + input);
     job.setJarByClass(PFPGrowth.class);
     
@@ -332,7 +327,7 @@ public final class PFPGrowth {
     job.setOutputValueClass(TopKStringPatterns.class);
     
     FileInputFormat.addInputPath(job, input);
-    Path outPath = new Path(params.get(OUTPUT), FPGROWTH);
+    Path outPath = new Path(params.get(OUTPUT), FP_GROWTH);
     FileOutputFormat.setOutputPath(job, outPath);
     
     HadoopUtil.delete(conf, outPath);

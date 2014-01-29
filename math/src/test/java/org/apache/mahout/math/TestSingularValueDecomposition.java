@@ -17,10 +17,19 @@
 
 package org.apache.mahout.math;
 
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.io.Resources;
 import org.apache.mahout.common.RandomUtils;
+import org.apache.mahout.math.function.Functions;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 //To launch this test only : mvn test -Dtest=org.apache.mahout.math.TestSingularValueDecomposition
 public final class TestSingularValueDecomposition extends MahoutTestCase {
@@ -225,6 +234,35 @@ public final class TestSingularValueDecomposition extends MahoutTestCase {
     // replace 1.0e-15 with 1.5e-15
     assertEquals(3.0, svd.cond(), 1.5e-15);
   }
+
+  @Test
+  public void testSvdHang() throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    System.out.printf("starting hanging-svd\n");
+    final Matrix m = readTsv("hanging-svd.tsv");
+    SingularValueDecomposition svd = new SingularValueDecomposition(m);
+    assertEquals(0, m.minus(svd.getU().times(svd.getS()).times(svd.getV().transpose())).aggregate(Functions.PLUS, Functions.ABS), 1e-10);
+    System.out.printf("No hang\n");
+  }
+
+  Matrix readTsv(String name) throws IOException {
+    Splitter onTab = Splitter.on("\t");
+    List<String> lines = Resources.readLines((Resources.getResource(name)), Charsets.UTF_8);
+    int rows = lines.size();
+    int columns = Iterables.size(onTab.split(lines.get(0)));
+    Matrix r = new DenseMatrix(rows, columns);
+    int row = 0;
+    for (String line : lines) {
+      Iterable<String> values = onTab.split(line);
+      int column = 0;
+      for (String value : values) {
+        r.set(row, column, Double.parseDouble(value));
+        column++;
+      }
+      row++;
+    }
+    return r;
+  }
+
   
   private static Matrix createTestMatrix(Random r, int rows, int columns, double[] singularValues) {
     Matrix u = createOrthogonalMatrix(r, rows);

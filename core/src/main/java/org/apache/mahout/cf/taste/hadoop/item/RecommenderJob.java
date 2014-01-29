@@ -22,6 +22,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -92,9 +93,10 @@ import java.util.regex.Pattern;
 public final class RecommenderJob extends AbstractJob {
 
   public static final String BOOLEAN_DATA = "booleanData";
+  public static final String DEFAULT_PREPARE_PATH = "preparePreferenceMatrix";
 
   private static final int DEFAULT_MAX_SIMILARITIES_PER_ITEM = 100;
-  private static final int DEFAULT_MAX_PREFS_PER_USER = 1000;
+  private static final int DEFAULT_MAX_PREFS = 500;
   private static final int DEFAULT_MIN_PREFS_PER_USER = 1;
 
   @Override
@@ -116,14 +118,16 @@ public final class RecommenderJob extends AbstractJob {
             + "(default: " + DEFAULT_MIN_PREFS_PER_USER + ')', String.valueOf(DEFAULT_MIN_PREFS_PER_USER));
     addOption("maxSimilaritiesPerItem", "m", "Maximum number of similarities considered per item ",
             String.valueOf(DEFAULT_MAX_SIMILARITIES_PER_ITEM));
-    addOption("maxPrefsPerUserInItemSimilarity", "mppuiis", "max number of preferences to consider per user in the " 
-            + "item similarity computation phase, users with more preferences will be sampled down (default: "
-        + DEFAULT_MAX_PREFS_PER_USER + ')', String.valueOf(DEFAULT_MAX_PREFS_PER_USER));
+    addOption("maxPrefsInItemSimilarity", "mpiis", "max number of preferences to consider per user or item in the "
+            + "item similarity computation phase, users or items with more preferences will be sampled down (default: "
+        + DEFAULT_MAX_PREFS + ')', String.valueOf(DEFAULT_MAX_PREFS));
     addOption("similarityClassname", "s", "Name of distributed similarity measures class to instantiate, " 
             + "alternatively use one of the predefined similarities (" + VectorSimilarityMeasures.list() + ')', true);
     addOption("threshold", "tr", "discard item pairs with a similarity value below this", false);
     addOption("outputPathForSimilarityMatrix", "opfsm", "write the item similarity matrix to this path (optional)",
         false);
+    addOption("randomSeed", null, "use this seed for sampling", false);
+    addFlag("sequencefileOutput", null, "write the output into a SequenceFile instead of a text file");
 
     Map<String, List<String>> parsedArgs = parseArguments(args);
     if (parsedArgs == null) {
@@ -138,14 +142,16 @@ public final class RecommenderJob extends AbstractJob {
     boolean booleanData = Boolean.valueOf(getOption("booleanData"));
     int maxPrefsPerUser = Integer.parseInt(getOption("maxPrefsPerUser"));
     int minPrefsPerUser = Integer.parseInt(getOption("minPrefsPerUser"));
-    int maxPrefsPerUserInItemSimilarity = Integer.parseInt(getOption("maxPrefsPerUserInItemSimilarity"));
+    int maxPrefsInItemSimilarity = Integer.parseInt(getOption("maxPrefsInItemSimilarity"));
     int maxSimilaritiesPerItem = Integer.parseInt(getOption("maxSimilaritiesPerItem"));
     String similarityClassname = getOption("similarityClassname");
     double threshold = hasOption("threshold")
         ? Double.parseDouble(getOption("threshold")) : RowSimilarityJob.NO_THRESHOLD;
+    long randomSeed = hasOption("randomSeed")
+        ? Long.parseLong(getOption("randomSeed")) : RowSimilarityJob.NO_FIXED_RANDOM_SEED;
 
 
-    Path prepPath = getTempPath("preparePreferenceMatrix");
+    Path prepPath = getTempPath(DEFAULT_PREPARE_PATH);
     Path similarityMatrixPath = getTempPath("similarityMatrix");
     Path explicitFilterPath = getTempPath("explicitFilterPath");
     Path partialMultiplyPath = getTempPath("partialMultiply");
@@ -158,7 +164,6 @@ public final class RecommenderJob extends AbstractJob {
       ToolRunner.run(getConf(), new PreparePreferenceMatrixJob(), new String[]{
         "--input", getInputPath().toString(),
         "--output", prepPath.toString(),
-        "--maxPrefsPerUser", String.valueOf(maxPrefsPerUserInItemSimilarity),
         "--minPrefsPerUser", String.valueOf(minPrefsPerUser),
         "--booleanData", String.valueOf(booleanData),
         "--tempDir", getTempPath().toString(),
@@ -176,17 +181,18 @@ public final class RecommenderJob extends AbstractJob {
                 PathType.LIST, null, getConf());
       }
 
-      /* Once DistributedRowMatrix uses the hadoop 0.20 API, we should refactor this call to something like
-       * new DistributedRowMatrix(...).rowSimilarity(...) */
       //calculate the co-occurrence matrix
       ToolRunner.run(getConf(), new RowSimilarityJob(), new String[]{
         "--input", new Path(prepPath, PreparePreferenceMatrixJob.RATING_MATRIX).toString(),
         "--output", similarityMatrixPath.toString(),
         "--numberOfColumns", String.valueOf(numberOfUsers),
         "--similarityClassname", similarityClassname,
+        "--maxObservationsPerRow", String.valueOf(maxPrefsInItemSimilarity),
+        "--maxObservationsPerColumn", String.valueOf(maxPrefsInItemSimilarity),
         "--maxSimilaritiesPerRow", String.valueOf(maxSimilaritiesPerItem),
         "--excludeSelfSimilarity", String.valueOf(Boolean.TRUE),
         "--threshold", String.valueOf(threshold),
+        "--randomSeed", String.valueOf(randomSeed),
         "--tempDir", getTempPath().toString(),
       });
 
@@ -255,12 +261,16 @@ public final class RecommenderJob extends AbstractJob {
       if (filterFile != null) {
         aggregateAndRecommendInput += "," + explicitFilterPath;
       }
+
+      Class<? extends OutputFormat> outputFormat = parsedArgs.containsKey("--sequencefileOutput")
+          ? SequenceFileOutputFormat.class : TextOutputFormat.class;
+
       //extract out the recommendations
       Job aggregateAndRecommend = prepareJob(
               new Path(aggregateAndRecommendInput), outputPath, SequenceFileInputFormat.class,
               PartialMultiplyMapper.class, VarLongWritable.class, PrefAndSimilarityColumnWritable.class,
               AggregateAndRecommendReducer.class, VarLongWritable.class, RecommendedItemsWritable.class,
-              TextOutputFormat.class);
+              outputFormat);
       Configuration aggregateAndRecommendConf = aggregateAndRecommend.getConfiguration();
       if (itemsFile != null) {
         aggregateAndRecommendConf.set(AggregateAndRecommendReducer.ITEMS_FILE, itemsFile);

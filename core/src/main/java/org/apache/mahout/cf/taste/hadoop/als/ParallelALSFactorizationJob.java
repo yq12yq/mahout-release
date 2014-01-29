@@ -51,6 +51,7 @@ import org.apache.mahout.common.iterator.sequencefile.PathFilters;
 import org.apache.mahout.common.mapreduce.MergeVectorsCombiner;
 import org.apache.mahout.common.mapreduce.MergeVectorsReducer;
 import org.apache.mahout.common.mapreduce.TransposeMapper;
+import org.apache.mahout.common.mapreduce.VectorSumCombiner;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.SequentialAccessSparseVector;
@@ -58,6 +59,7 @@ import org.apache.mahout.math.VarIntWritable;
 import org.apache.mahout.math.VarLongWritable;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
+import org.apache.mahout.math.hadoop.similarity.cooccurrence.Vectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,19 +245,6 @@ public class ParallelALSFactorizationJob extends AbstractJob {
     }
   }
 
-  static class VectorSumCombiner
-      extends Reducer<WritableComparable<?>, VectorWritable, WritableComparable<?>, VectorWritable> {
-
-    private final VectorWritable result = new VectorWritable();
-
-    @Override
-    protected void reduce(WritableComparable<?> key, Iterable<VectorWritable> values, Context ctx)
-      throws IOException, InterruptedException {
-      result.set(ALS.sum(values.iterator()));
-      ctx.write(key, result);
-    }
-  }
-
   static class VectorSumReducer
       extends Reducer<WritableComparable<?>, VectorWritable, WritableComparable<?>, VectorWritable> {
 
@@ -264,7 +253,7 @@ public class ParallelALSFactorizationJob extends AbstractJob {
     @Override
     protected void reduce(WritableComparable<?> key, Iterable<VectorWritable> values, Context ctx)
       throws IOException, InterruptedException {
-      Vector sum = ALS.sum(values.iterator());
+      Vector sum = Vectors.sum(values.iterator());
       result.set(new SequentialAccessSparseVector(sum));
       ctx.write(key, result);
     }
@@ -323,17 +312,16 @@ public class ParallelALSFactorizationJob extends AbstractJob {
     // necessary for local execution in the same JVM only
     SharingMapper.reset();
 
-    int iterationNumber = currentIteration + 1;
     Class<? extends Mapper<IntWritable,VectorWritable,IntWritable,VectorWritable>> solverMapperClassInternal;
     String name;
 
     if (implicitFeedback) {
       solverMapperClassInternal = SolveImplicitFeedbackMapper.class;
-      name = "Recompute " + matrixName + ", iteration (" + (iterationNumber + 1) + '/' + numIterations + "), "
+      name = "Recompute " + matrixName + ", iteration (" + currentIteration + '/' + numIterations + "), "
           + '(' + numThreadsPerSolver + " threads, " + numFeatures + " features, implicit feedback)";
     } else {
       solverMapperClassInternal = SolveExplicitFeedbackMapper.class;
-      name = "Recompute " + matrixName + ", iteration (" + (iterationNumber + 1) + '/' + numIterations + "), "
+      name = "Recompute " + matrixName + ", iteration (" + currentIteration + '/' + numIterations + "), "
           + '(' + numThreadsPerSolver + " threads, " + numFeatures + " features, explicit feedback)";
     }
 

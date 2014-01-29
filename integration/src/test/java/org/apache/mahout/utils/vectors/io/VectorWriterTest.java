@@ -22,16 +22,17 @@ import java.util.Collection;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.mahout.common.HadoopUtil;
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.math.DenseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
-import org.apache.mahout.utils.MahoutTestCase;
 import org.apache.mahout.utils.vectors.RandomVectorIterable;
 import org.junit.Test;
 
@@ -40,7 +41,7 @@ public final class VectorWriterTest extends MahoutTestCase {
   @Test
   public void testSFVW() throws Exception {
     Path path = getTestTempFilePath("sfvw");
-    Configuration conf = new Configuration();
+    Configuration conf = getConfiguration();
     FileSystem fs = FileSystem.get(conf);
     SequenceFile.Writer seqWriter = new SequenceFile.Writer(fs, conf, path, LongWritable.class, VectorWritable.class);
     SequenceFileVectorWriter writer = new SequenceFileVectorWriter(seqWriter);

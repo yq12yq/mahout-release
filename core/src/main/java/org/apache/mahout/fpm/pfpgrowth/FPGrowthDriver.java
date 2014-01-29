@@ -45,7 +45,6 @@ import org.apache.mahout.fpm.pfpgrowth.fpgrowth.FPGrowth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Deprecated
 public final class FPGrowthDriver extends AbstractJob {
 
   private static final Logger log = LoggerFactory.getLogger(FPGrowthDriver.class);
@@ -177,8 +176,8 @@ public final class FPGrowthDriver extends AbstractJob {
                 minSupport,
                 maxHeapSize,
                 features,
-                new StringOutputConverter(new SequenceFileOutputCollector<Text, TopKStringPatterns>(writer)),
-                new ContextStatusUpdater(null));
+                new StringOutputConverter(new SequenceFileOutputCollector<Text, TopKStringPatterns>(writer))
+        );
       } finally {
         Closeables.close(writer, false);
         Closeables.close(inputStream, true);

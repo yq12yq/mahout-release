@@ -17,6 +17,7 @@
 package org.apache.mahout.text;
 
 import com.google.common.collect.Lists;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -25,11 +26,11 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.Pair;
 import org.apache.mahout.text.doc.MultipleFieldsDocument;
 import org.apache.mahout.text.doc.NumericFieldDocument;
 import org.apache.mahout.text.doc.SingleFieldDocument;
-import org.apache.mahout.utils.MahoutTestCase;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +60,7 @@ public abstract class AbstractLuceneStorageTest extends MahoutTestCase {
   }
 
   protected void commitDocuments(Directory directory, Iterable<SingleFieldDocument> theDocs) throws IOException{
-    IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43)));
+    IndexWriter indexWriter = new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_46, new StandardAnalyzer(Version.LUCENE_46)));
 
     for (SingleFieldDocument singleFieldDocument : theDocs) {
       indexWriter.addDocument(singleFieldDocument.asLuceneDocument());
@@ -71,11 +72,6 @@ public abstract class AbstractLuceneStorageTest extends MahoutTestCase {
 
   protected void commitDocuments(Directory directory, SingleFieldDocument... documents) throws IOException {
     commitDocuments(directory, Arrays.asList(documents));
-  }
-
-  protected void assertSimpleDocumentEquals(SingleFieldDocument expected, Pair<Text, Text> actual) {
-    assertEquals(expected.getId(), actual.getFirst().toString());
-    assertEquals(expected.getField(), actual.getSecond().toString());
   }
 
   protected void assertMultipleFieldsDocumentEquals(MultipleFieldsDocument expected, Pair<Text, Text> actual) {

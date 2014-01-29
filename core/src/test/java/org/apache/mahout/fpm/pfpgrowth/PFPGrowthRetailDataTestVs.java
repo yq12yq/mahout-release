@@ -42,7 +42,6 @@ import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
-@Deprecated
 public final class PFPGrowthRetailDataTestVs extends MahoutTestCase {
 
   private final Parameters paramsImpl1 = new Parameters();
@@ -56,13 +55,13 @@ public final class PFPGrowthRetailDataTestVs extends MahoutTestCase {
     File input = new File(inputDir, "test.txt");
 
     paramsImpl1.set(PFPGrowth.MIN_SUPPORT, "100");
-    paramsImpl1.set(PFPGrowth.MAX_HEAPSIZE, "10000");
+    paramsImpl1.set(PFPGrowth.MAX_HEAP_SIZE, "10000");
     paramsImpl1.set(PFPGrowth.NUM_GROUPS, "50");
     paramsImpl1.set(PFPGrowth.ENCODING, "UTF-8");
     paramsImpl1.set(PFPGrowth.INPUT, input.getAbsolutePath());
 
     paramsImpl2.set(PFPGrowth.MIN_SUPPORT, "100");
-    paramsImpl2.set(PFPGrowth.MAX_HEAPSIZE, "10000");
+    paramsImpl2.set(PFPGrowth.MAX_HEAP_SIZE, "10000");
     paramsImpl2.set(PFPGrowth.NUM_GROUPS, "50");
     paramsImpl2.set(PFPGrowth.ENCODING, "UTF-8");
     paramsImpl2.set(PFPGrowth.INPUT, input.getAbsolutePath());

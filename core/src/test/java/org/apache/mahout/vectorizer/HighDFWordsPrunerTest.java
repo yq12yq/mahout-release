@@ -16,6 +16,7 @@ package org.apache.mahout.vectorizer;
  * limitations under the License.
  */
 
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -37,9 +38,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
+@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
 public class HighDFWordsPrunerTest extends MahoutTestCase {
   private static final int NUM_DOCS = 100;
 
@@ -107,7 +108,7 @@ public class HighDFWordsPrunerTest extends MahoutTestCase {
 
     String[] args = argList.toArray(new String[argList.size()]);
 
-    ToolRunner.run(getConfiguration(), new SparseVectorsFromSequenceFiles(), args);
+    ToolRunner.run(conf, new SparseVectorsFromSequenceFiles(), args);
 
     Path dictionary = new Path(outputPath, "dictionary.file-0");
     Path tfVectors = new Path(outputPath, "tf-vectors");
@@ -134,7 +135,8 @@ public class HighDFWordsPrunerTest extends MahoutTestCase {
     return highDFWordsDictionaryIndices;
   }
 
-  private void validateVectors(Path vectorPath, int[] highDFWordsDictionaryIndices, boolean prune) {
+  private void validateVectors(Path vectorPath, int[] highDFWordsDictionaryIndices, boolean prune) throws Exception {
+    assertTrue("Path does not exist", vectorPath.getFileSystem(conf).exists(vectorPath));
     for (VectorWritable value : new SequenceFileDirValueIterable<VectorWritable>(vectorPath, PathType.LIST, PathFilters
             .partFilter(), null, true, conf)) {
       Vector v = ((NamedVector) value.get()).getDelegate();

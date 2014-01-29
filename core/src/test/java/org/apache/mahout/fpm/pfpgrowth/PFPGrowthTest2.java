@@ -36,7 +36,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Deprecated
 public final class PFPGrowthTest2 extends MahoutTestCase {
   
   private static final Logger log = LoggerFactory.getLogger(PFPGrowthTest.class);
@@ -47,7 +46,7 @@ public final class PFPGrowthTest2 extends MahoutTestCase {
   public void setUp() throws Exception {
     super.setUp();
     params.set(PFPGrowth.MIN_SUPPORT, "3");
-    params.set(PFPGrowth.MAX_HEAPSIZE, "4");
+    params.set(PFPGrowth.MAX_HEAP_SIZE, "4");
     params.set(PFPGrowth.NUM_GROUPS, "2");
     params.set(PFPGrowth.ENCODING, "UTF-8");
     params.set(PFPGrowth.USE_FPG2, "true");
@@ -105,9 +104,9 @@ public final class PFPGrowthTest2 extends MahoutTestCase {
   @Test
   public void testStartParallelFPGrowthInSteps() throws Exception {
     Configuration conf = new Configuration();
-    log.info("Starting Parallel Counting Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Starting Parallel Counting Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     PFPGrowth.startParallelCounting(params, conf);
-    log.info("Reading fList Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Reading fList Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     List<Pair<String,Long>> fList = PFPGrowth.readFList(params);
     log.info("{}", fList);
     assertEquals("[(B,6), (D,6), (A,5), (E,4), (C,3)]", fList.toString());
@@ -121,9 +120,9 @@ public final class PFPGrowthTest2 extends MahoutTestCase {
     }
     params.set(PFPGrowth.MAX_PER_GROUP, Integer.toString(maxPerGroup));
 
-    log.info("Starting Parallel FPGrowth Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Starting Parallel FPGrowth Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     PFPGrowth.startParallelFPGrowth(params, conf);
-    log.info("Starting Pattern Aggregation Test: {}", params.get(PFPGrowth.MAX_HEAPSIZE));
+    log.info("Starting Pattern Aggregation Test: {}", params.get(PFPGrowth.MAX_HEAP_SIZE));
     PFPGrowth.startAggregating(params, conf);
 
     List<Pair<String,TopKStringPatterns>> frequentPatterns = PFPGrowth.readFrequentPattern(params);

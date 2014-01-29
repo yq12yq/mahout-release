@@ -20,14 +20,17 @@ package org.apache.mahout.clustering.classify;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -38,12 +41,16 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.clustering.Cluster;
 import org.apache.mahout.clustering.iterator.ClusterWritable;
 import org.apache.mahout.clustering.iterator.ClusteringPolicy;
+import org.apache.mahout.clustering.iterator.DistanceMeasureCluster;
 import org.apache.mahout.common.AbstractJob;
+import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.commandline.DefaultOptionCreator;
+import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.common.iterator.sequencefile.PathFilters;
 import org.apache.mahout.common.iterator.sequencefile.PathType;
-import org.apache.mahout.common.iterator.sequencefile.SequenceFileDirValueIterable;
+import org.apache.mahout.common.iterator.sequencefile.SequenceFileDirIterable;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileDirValueIterator;
+import org.apache.mahout.math.NamedVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.Vector.Element;
 import org.apache.mahout.math.VectorWritable;
@@ -122,15 +129,8 @@ public final class ClusterClassificationDriver extends AbstractJob {
    * @throws InterruptedException
    * @throws ClassNotFoundException
    */
-  public static void run(Path input, Path clusteringOutputPath, Path output, Double clusterClassificationThreshold,
+  public static void run(Configuration conf, Path input, Path clusteringOutputPath, Path output, Double clusterClassificationThreshold,
       boolean emitMostLikely, boolean runSequential) throws IOException, InterruptedException, ClassNotFoundException {
-    Configuration conf = new Configuration();
-    run(conf, input, clusteringOutputPath, output, clusterClassificationThreshold, emitMostLikely, runSequential);
-  }
-
-  public static void run(Configuration conf, Path input, Path clusteringOutputPath, Path output,
-                         Double clusterClassificationThreshold, boolean emitMostLikely, boolean runSequential)
-    throws IOException, InterruptedException, ClassNotFoundException {
     if (runSequential) {
       classifyClusterSeq(conf, input, clusteringOutputPath, output, clusterClassificationThreshold, emitMostLikely);
     } else {
@@ -190,20 +190,34 @@ public final class ClusterClassificationDriver extends AbstractJob {
    * @param output
    *          the path to store classified data
    * @param clusterClassificationThreshold
+   *          the threshold value of probability distribution function from 0.0
+   *          to 1.0. Any vector with pdf less that this threshold will not be
+   *          classified for the cluster
    * @param emitMostLikely
-   *          TODO
+   *          emit the vectors with the max pdf values per cluster
    * @throws IOException
    */
   private static void selectCluster(Path input, List<Cluster> clusterModels, ClusterClassifier clusterClassifier,
       Path output, Double clusterClassificationThreshold, boolean emitMostLikely) throws IOException {
     Configuration conf = new Configuration();
     SequenceFile.Writer writer = new SequenceFile.Writer(input.getFileSystem(conf), conf, new Path(output,
-        "part-m-" + 0), IntWritable.class, WeightedVectorWritable.class);
-    for (VectorWritable vw : new SequenceFileDirValueIterable<VectorWritable>(input, PathType.LIST,
+        "part-m-" + 0), IntWritable.class, WeightedPropertyVectorWritable.class);
+    for (Pair<Writable, VectorWritable> vw : new SequenceFileDirIterable<Writable, VectorWritable>(input, PathType.LIST,
         PathFilters.logsCRCFilter(), conf)) {
-      Vector pdfPerCluster = clusterClassifier.classify(vw.get());
+      // Converting to NamedVectors to preserve the vectorId else its not obvious as to which point
+      // belongs to which cluster - fix for MAHOUT-1410
+      Class<? extends Writable> keyClass = vw.getFirst().getClass();
+      Vector vector = vw.getSecond().get();
+      if (!keyClass.equals(NamedVector.class)) {
+        if (keyClass.equals(Text.class)) {
+          vector = new NamedVector(vector, vw.getFirst().toString());
+        } else if (keyClass.equals(IntWritable.class)) {
+          vector = new NamedVector(vector, Integer.toString(((IntWritable) vw.getFirst()).get()));
+        }
+      }
+      Vector pdfPerCluster = clusterClassifier.classify(vector);
       if (shouldClassify(pdfPerCluster, clusterClassificationThreshold)) {
-        classifyAndWrite(clusterModels, clusterClassificationThreshold, emitMostLikely, writer, vw, pdfPerCluster);
+        classifyAndWrite(clusterModels, clusterClassificationThreshold, emitMostLikely, writer, new VectorWritable(vector), pdfPerCluster);
       }
     }
     writer.close();
@@ -211,10 +225,12 @@ public final class ClusterClassificationDriver extends AbstractJob {
   
   private static void classifyAndWrite(List<Cluster> clusterModels, Double clusterClassificationThreshold,
       boolean emitMostLikely, SequenceFile.Writer writer, VectorWritable vw, Vector pdfPerCluster) throws IOException {
+    Map<Text, Text> props = Maps.newHashMap();
     if (emitMostLikely) {
       int maxValueIndex = pdfPerCluster.maxValueIndex();
-      WeightedVectorWritable wvw = new WeightedVectorWritable(pdfPerCluster.maxValue(), vw.get());
-      write(clusterModels, writer, wvw, maxValueIndex);
+      WeightedPropertyVectorWritable weightedPropertyVectorWritable =
+          new WeightedPropertyVectorWritable(pdfPerCluster.maxValue(), vw.get(), props);
+      write(clusterModels, writer, weightedPropertyVectorWritable, maxValueIndex);
     } else {
       writeAllAboveThreshold(clusterModels, clusterClassificationThreshold, writer, vw, pdfPerCluster);
     }
@@ -222,19 +238,27 @@ public final class ClusterClassificationDriver extends AbstractJob {
   
   private static void writeAllAboveThreshold(List<Cluster> clusterModels, Double clusterClassificationThreshold,
       SequenceFile.Writer writer, VectorWritable vw, Vector pdfPerCluster) throws IOException {
+    Map<Text, Text> props = Maps.newHashMap();
     for (Element pdf : pdfPerCluster.nonZeroes()) {
       if (pdf.get() >= clusterClassificationThreshold) {
-        WeightedVectorWritable wvw = new WeightedVectorWritable(pdf.get(), vw.get());
+        WeightedPropertyVectorWritable wvw = new WeightedPropertyVectorWritable(pdf.get(), vw.get(), props);
         int clusterIndex = pdf.index();
         write(clusterModels, writer, wvw, clusterIndex);
       }
     }
   }
-  
-  private static void write(List<Cluster> clusterModels, SequenceFile.Writer writer, WeightedVectorWritable wvw,
+
+  private static void write(List<Cluster> clusterModels, SequenceFile.Writer writer,
+      WeightedPropertyVectorWritable weightedPropertyVectorWritable,
       int maxValueIndex) throws IOException {
     Cluster cluster = clusterModels.get(maxValueIndex);
-    writer.append(new IntWritable(cluster.getId()), wvw);
+
+    DistanceMeasureCluster distanceMeasureCluster = (DistanceMeasureCluster) cluster;
+    DistanceMeasure distanceMeasure = distanceMeasureCluster.getMeasure();
+    double distance = distanceMeasure.distance(cluster.getCenter(), weightedPropertyVectorWritable.getVector());
+
+    weightedPropertyVectorWritable.getProperties().put(new Text("distance"), new Text(Double.toString(distance)));
+    writer.append(new IntWritable(cluster.getId()), weightedPropertyVectorWritable);
   }
   
   /**
@@ -266,7 +290,7 @@ public final class ClusterClassificationDriver extends AbstractJob {
     job.setNumReduceTasks(0);
     
     job.setOutputKeyClass(IntWritable.class);
-    job.setOutputValueClass(WeightedVectorWritable.class);
+    job.setOutputValueClass(WeightedPropertyVectorWritable.class);
     
     FileInputFormat.addInputPath(job, input);
     FileOutputFormat.setOutputPath(job, output);

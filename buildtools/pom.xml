@@ -29,7 +29,7 @@
 
   <groupId>org.apache.mahout</groupId>
   <artifactId>mahout-buildtools</artifactId>
-  <version>0.8</version>
+  <version>1.0-SNAPSHOT</version>
   <name>Mahout Build Tools</name>
 
   <packaging>jar</packaging>
@@ -37,6 +37,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <prerequisites>
+    <maven>3.0</maven>
+  </prerequisites>
 
   <build>
     <plugins>
@@ -117,11 +121,4 @@
       </build>
     </profile>
   </profiles>
-
-
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/pom/tags/mahout-0.8/mahout-buildtools</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/pom/tags/mahout-0.8/mahout-buildtools</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/pom/tags/mahout-0.8/mahout-buildtools</url>
-  </scm>
 </project>

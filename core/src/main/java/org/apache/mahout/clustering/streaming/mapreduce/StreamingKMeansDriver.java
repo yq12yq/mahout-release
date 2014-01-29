@@ -40,6 +40,7 @@ import org.apache.hadoop.util.ToolRunner;
 import org.apache.mahout.common.AbstractJob;
 import org.apache.mahout.common.HadoopUtil;
 import org.apache.mahout.common.commandline.DefaultOptionCreator;
+import org.apache.mahout.common.iterator.sequencefile.PathFilters;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.BruteSearch;
@@ -336,13 +337,14 @@ public final class StreamingKMeansDriver extends AbstractJob {
                                                 String method,
                                                 boolean reduceStreamingKMeans) throws ClassNotFoundException {
     // Checking preconditions for the parameters.
-    Preconditions.checkArgument(numClusters > 0, "Invalid number of clusters requested");
+    Preconditions.checkArgument(numClusters > 0, 
+        "Invalid number of clusters requested: " + numClusters + ". Must be: numClusters > 0!");
 
     // StreamingKMeans
     Preconditions.checkArgument(estimatedNumMapClusters > numClusters, "Invalid number of estimated map "
         + "clusters; There must be more than the final number of clusters (k log n vs k)");
     Preconditions.checkArgument(estimatedDistanceCutoff == INVALID_DISTANCE_CUTOFF || estimatedDistanceCutoff > 0,
-        "estimatedDistanceCutoff cannot be negative");
+        "estimatedDistanceCutoff must be equal to -1 or must be greater then 0!");
 
     // BallKMeans
     Preconditions.checkArgument(maxNumIterations > 0, "Must have at least one BallKMeans iteration");
@@ -405,7 +407,6 @@ public final class StreamingKMeansDriver extends AbstractJob {
    * @param output the directory pathname for output points.
    * @return 0 on success, -1 on failure.
    */
-  @SuppressWarnings("unchecked")
   public static int run(Configuration conf, Path input, Path output)
       throws IOException, InterruptedException, ClassNotFoundException, ExecutionException {
     log.info("Starting StreamingKMeans clustering for vectors in {}; results are output to {}",
@@ -425,7 +426,7 @@ public final class StreamingKMeansDriver extends AbstractJob {
     // Run StreamingKMeans step in parallel by spawning 1 thread per input path to process.
     ExecutorService pool = Executors.newCachedThreadPool();
     List<Future<Iterable<Centroid>>> intermediateCentroidFutures = Lists.newArrayList();
-    for (FileStatus status : HadoopUtil.listStatus(FileSystem.get(conf), input)) {
+    for (FileStatus status : HadoopUtil.listStatus(FileSystem.get(conf), input, PathFilters.logsCRCFilter())) {
       intermediateCentroidFutures.add(pool.submit(new StreamingKMeansThread(status.getPath(), conf)));
     }
     log.info("Finished running Mappers");
@@ -439,7 +440,7 @@ public final class StreamingKMeansDriver extends AbstractJob {
     pool.shutdown();
     pool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
     log.info("Finished StreamingKMeans");
-    SequenceFile.Writer writer = SequenceFile.createWriter(FileSystem.get(conf), conf, output, IntWritable.class,
+    SequenceFile.Writer writer = SequenceFile.createWriter(FileSystem.get(conf), conf, new Path(output, "part-r-00000"), IntWritable.class,
         CentroidWritable.class);
     int numCentroids = 0;
     // Run BallKMeans on the intermediate centroids.
@@ -453,7 +454,6 @@ public final class StreamingKMeansDriver extends AbstractJob {
     return 0;
   }
 
-  @SuppressWarnings("unchecked")
   public static int runMapReduce(Configuration conf, Path input, Path output)
     throws IOException, ClassNotFoundException, InterruptedException {
     // Prepare Job for submission.

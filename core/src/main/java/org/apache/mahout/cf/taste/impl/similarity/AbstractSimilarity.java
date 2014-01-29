@@ -28,8 +28,6 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.similarity.PreferenceInferrer;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
-import org.apache.mahout.cf.taste.transforms.PreferenceTransform;
-import org.apache.mahout.cf.taste.transforms.SimilarityTransform;
 
 import com.google.common.base.Preconditions;
 
@@ -37,8 +35,6 @@ import com.google.common.base.Preconditions;
 abstract class AbstractSimilarity extends AbstractItemSimilarity implements UserSimilarity {
 
   private PreferenceInferrer inferrer;
-  private PreferenceTransform prefTransform;
-  private SimilarityTransform similarityTransform;
   private final boolean weighted;
   private final boolean centerData;
   private int cachedNumItems;
@@ -47,7 +43,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
 
   /**
    * <p>
-   * Creates a possibly weighted AbstractSimilarity.
+   * Creates a possibly weighted {@link AbstractSimilarity}.
    * </p>
    */
   AbstractSimilarity(final DataModel dataModel, Weighting weighting, boolean centerData) throws TasteException {
@@ -78,26 +74,6 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
     this.inferrer = inferrer;
   }
   
-  public final PreferenceTransform getPrefTransform() {
-    return prefTransform;
-  }
-  
-  public final void setPrefTransform(PreferenceTransform prefTransform) {
-    refreshHelper.addDependency(prefTransform);
-    refreshHelper.removeDependency(this.prefTransform);
-    this.prefTransform = prefTransform;
-  }
-  
-  public final SimilarityTransform getSimilarityTransform() {
-    return similarityTransform;
-  }
-  
-  public final void setSimilarityTransform(SimilarityTransform similarityTransform) {
-    refreshHelper.addDependency(similarityTransform);
-    refreshHelper.removeDependency(this.similarityTransform);
-    this.similarityTransform = similarityTransform;
-  }
-  
   final boolean isWeighted() {
     return weighted;
   }
@@ -117,7 +93,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
    * @param n
    *          total number of users or items
    * @param sumXY
-   *          sum of product of user/item preference values, over all items/users prefererred by both
+   *          sum of product of user/item preference values, over all items/users preferred by both
    *          users/items
    * @param sumX2
    *          sum of the square of user/item preference values, over the first item/user
@@ -126,7 +102,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
    * @param sumXYdiff2
    *          sum of squares of differences in X and Y values
    * @return similarity value between -1.0 and 1.0, inclusive, or {@link Double#NaN} if no similarity can be
-   *         computed (e.g. when no items have been rated by both uesrs
+   *         computed (e.g. when no items have been rated by both users
    */
   abstract double computeResult(int n, double sumXY, double sumX2, double sumY2, double sumXYdiff2);
   
@@ -156,7 +132,6 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
     int count = 0;
     
     boolean hasInferrer = inferrer != null;
-    boolean hasPrefTransform = prefTransform != null;
     
     while (true) {
       int compare = xIndex < yIndex ? -1 : xIndex > yIndex ? 1 : 0;
@@ -165,29 +140,20 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
         double y;
         if (xIndex == yIndex) {
           // Both users expressed a preference for the item
-          if (hasPrefTransform) {
-            x = prefTransform.getTransformedValue(xPrefs.get(xPrefIndex));
-            y = prefTransform.getTransformedValue(yPrefs.get(yPrefIndex));
-          } else {
-            x = xPrefs.getValue(xPrefIndex);
-            y = yPrefs.getValue(yPrefIndex);
-          }
+          x = xPrefs.getValue(xPrefIndex);
+          y = yPrefs.getValue(yPrefIndex);
         } else {
           // Only one user expressed a preference, but infer the other one's preference and tally
           // as if the other user expressed that preference
           if (compare < 0) {
             // X has a value; infer Y's
-            x = hasPrefTransform
-                ? prefTransform.getTransformedValue(xPrefs.get(xPrefIndex))
-                : xPrefs.getValue(xPrefIndex);
+            x = xPrefs.getValue(xPrefIndex);
             y = inferrer.inferPreference(userID2, xIndex);
           } else {
             // compare > 0
             // Y has a value; infer X's
             x = inferrer.inferPreference(userID1, yIndex);
-            y = hasPrefTransform
-                ? prefTransform.getTransformedValue(yPrefs.get(yPrefIndex))
-                : yPrefs.getValue(yPrefIndex);
+            y = yPrefs.getValue(yPrefIndex);
           }
         }
         sumXY += x * y;
@@ -218,7 +184,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
       if (compare >= 0) {
         if (++yPrefIndex >= yLength) {
           if (hasInferrer) {
-            // Must count other Xs; pretend next Y is far away            
+            // Must count other Xs; pretend next Y is far away
             if (xIndex == Long.MAX_VALUE) {
               // ... but stop if both are done!
               break;
@@ -247,10 +213,6 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
       result = computeResult(count, centeredSumXY, centeredSumX2, centeredSumY2, sumXYdiff2);
     } else {
       result = computeResult(count, sumXY, sumX2, sumY2, sumXYdiff2);
-    }
-    
-    if (similarityTransform != null) {
-      result = similarityTransform.transformSimilarity(userID1, userID2, result);
     }
     
     if (!Double.isNaN(result)) {
@@ -284,7 +246,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
     double sumXYdiff2 = 0.0;
     int count = 0;
     
-    // No, pref inferrers and transforms don't appy here. I think.
+    // No, pref inferrers and transforms don't apply here. I think.
     
     while (true) {
       int compare = xIndex < yIndex ? -1 : xIndex > yIndex ? 1 : 0;
@@ -330,10 +292,6 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
       result = computeResult(count, centeredSumXY, centeredSumX2, centeredSumY2, sumXYdiff2);
     } else {
       result = computeResult(count, sumXY, sumX2, sumY2, sumXYdiff2);
-    }
-    
-    if (similarityTransform != null) {
-      result = similarityTransform.transformSimilarity(itemID1, itemID2, result);
     }
     
     if (!Double.isNaN(result)) {

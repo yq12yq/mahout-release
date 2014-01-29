@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * @param <K>
  * @param <V>
  */
-@Deprecated
 public class ContextWriteOutputCollector<IK extends Writable,IV extends Writable,K extends Writable,V extends Writable>
     implements OutputCollector<K,V> {
   

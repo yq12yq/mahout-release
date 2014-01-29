@@ -22,7 +22,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.lucene.index.SegmentInfoPerCommit;
+import org.apache.lucene.index.SegmentCommitInfo;
 import org.apache.lucene.index.SegmentReader;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Scorer;
@@ -52,11 +52,17 @@ public class LuceneSegmentRecordReader extends RecordReader<Text, NullWritable> 
     Configuration configuration = context.getConfiguration();
     LuceneStorageConfiguration lucene2SeqConfiguration = new LuceneStorageConfiguration(configuration);
 
-    SegmentInfoPerCommit segmentInfo = inputSplit.getSegment(configuration);
+    SegmentCommitInfo segmentInfo = inputSplit.getSegment(configuration);
     segmentReader = new SegmentReader(segmentInfo, USE_TERM_INFO, IOContext.READ);
 
 
     IndexSearcher searcher = new IndexSearcher(segmentReader);
+    String idField = lucene2SeqConfiguration.getIdField();
+    LuceneIndexHelper.fieldShouldExistInIndex(searcher, idField);
+    for (String field : lucene2SeqConfiguration.getFields()) {
+        LuceneIndexHelper.fieldShouldExistInIndex(searcher, field);
+    }
+
     Weight weight = lucene2SeqConfiguration.getQuery().createWeight(searcher);
     scorer = weight.scorer(segmentReader.getContext(), false, false, null);
     if (scorer == null) {

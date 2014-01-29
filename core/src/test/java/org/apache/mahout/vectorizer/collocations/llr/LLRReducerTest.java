@@ -19,7 +19,6 @@ package org.apache.mahout.vectorizer.collocations.llr;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import com.google.common.collect.Lists;
 import org.apache.hadoop.conf.Configuration;
@@ -91,7 +90,7 @@ public final class LLRReducerTest extends MahoutTestCase {
                             {1, 0, 1, 5}  // worst of
     };
     
-    Configuration config = new Configuration();
+    Configuration config = getConfiguration();
     config.set(LLRReducer.NGRAM_TOTAL, "7");
     EasyMock.expect(context.getConfiguration()).andReturn(config);
     

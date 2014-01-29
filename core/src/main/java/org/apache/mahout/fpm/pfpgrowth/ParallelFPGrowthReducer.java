@@ -45,7 +45,6 @@ import org.apache.mahout.math.list.LongArrayList;
  * outputs the the Top K frequent Patterns for each group.
  * 
  */
-@Deprecated
 public final class ParallelFPGrowthReducer extends Reducer<IntWritable,TransactionTree,Text,TopKStringPatterns> {
 
   private final List<String> featureReverseMap = Lists.newArrayList();
@@ -105,8 +104,8 @@ public final class ParallelFPGrowthReducer extends Reducer<IntWritable,Transacti
           PFPGrowth.getGroupMembers(key.get(), maxPerGroup, numFeatures),
           new IntegerStringOutputConverter(
               new ContextWriteOutputCollector<IntWritable, TransactionTree, Text, TopKStringPatterns>(context),
-              featureReverseMap),
-          new ContextStatusUpdater<IntWritable, TransactionTree, Text, TopKStringPatterns>(context));
+              featureReverseMap)
+      );
     } else {
       FPGrowth<Integer> fpGrowth = new FPGrowth<Integer>();
       fpGrowth.generateTopKFrequentPatterns(
@@ -135,7 +134,7 @@ public final class ParallelFPGrowthReducer extends Reducer<IntWritable,Transacti
       freqList.add(e.getSecond());
     }
     
-    maxHeapSize = Integer.valueOf(params.get(PFPGrowth.MAX_HEAPSIZE, "50"));
+    maxHeapSize = Integer.valueOf(params.get(PFPGrowth.MAX_HEAP_SIZE, "50"));
     minSupport = Integer.valueOf(params.get(PFPGrowth.MIN_SUPPORT, "3"));
 
     maxPerGroup = params.getInt(PFPGrowth.MAX_PER_GROUP, 0);

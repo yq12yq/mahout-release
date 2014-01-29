@@ -34,7 +34,6 @@ import org.apache.mahout.common.Parameters;
  * WordCount example
  * 
  */
-@Deprecated
 public class ParallelCountingMapper extends Mapper<LongWritable,Text,Text,LongWritable> {
   
   private static final LongWritable ONE = new LongWritable(1);

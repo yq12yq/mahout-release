@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
  * Map/Reduce of {@link PFPGrowth} algorithm by reducing data size passed from the Mapper to the reducer where
  * {@link org.apache.mahout.fpm.pfpgrowth.fpgrowth.FPGrowth} mining is done
  */
-@Deprecated
 public final class TransactionTree implements Writable, Iterable<Pair<IntArrayList,Long>> {
 
   private static final Logger log = LoggerFactory.getLogger(TransactionTree.class);
@@ -167,9 +166,7 @@ public final class TransactionTree implements Writable, Iterable<Pair<IntArrayLi
   
   public Map<Integer,MutableLong> generateFList() {
     Map<Integer,MutableLong> frequencyList = Maps.newHashMap();
-    Iterator<Pair<IntArrayList,Long>> it = iterator();
-    while (it.hasNext()) {
-      Pair<IntArrayList,Long> p = it.next();
+    for (Pair<IntArrayList, Long> p : this) {
       IntArrayList items = p.getFirst();
       for (int idx = 0; idx < items.size(); idx++) {
         if (!frequencyList.containsKey(items.get(idx))) {

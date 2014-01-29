@@ -18,11 +18,8 @@ package org.apache.mahout.text;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.JobContext;
-import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.JobID;
-import org.apache.hadoop.mapred.JobContextImpl;
 import org.apache.mahout.common.HadoopUtil;
 import org.apache.mahout.text.doc.SingleFieldDocument;
 import org.junit.After;
@@ -31,22 +28,24 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 
 public class LuceneSegmentInputFormatTest extends AbstractLuceneStorageTest {
 
   private LuceneSegmentInputFormat inputFormat;
-  private Job jobContext;
-  private JobConf conf;
+  private JobContext jobContext;
+  private Configuration conf;
 
   @Before
-  public void before() throws IOException {
+  public void before() throws Exception {
     inputFormat = new LuceneSegmentInputFormat();
-    LuceneStorageConfiguration lucene2SeqConf = new LuceneStorageConfiguration(new Configuration(), Collections.singletonList(indexPath1), new Path("output"), "id", Collections.singletonList("field"));
-    conf = lucene2SeqConf.serializeToJobConf();
+    LuceneStorageConfiguration lucene2SeqConf = new
+    LuceneStorageConfiguration(getConfiguration(), Collections.singletonList(indexPath1), new Path("output"), "id", Collections.singletonList("field"));
+    conf = lucene2SeqConf.serialize();
 
-    jobContext = new Job(conf, new JobID().toString());
+    jobContext = getJobContext(conf, new JobID());
   }
 
   @After
@@ -67,5 +66,20 @@ public class LuceneSegmentInputFormatTest extends AbstractLuceneStorageTest {
 
     List<LuceneSegmentInputSplit> splits = inputFormat.getSplits(jobContext);
     Assert.assertEquals(3, splits.size());
+  }
+
+  // Use reflection to abstract this incompatibility between Hadoop 1 & 2 APIs.
+  private JobContext getJobContext(Configuration conf, JobID jobID) throws
+      ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
+      InvocationTargetException, InstantiationException {
+    Class<? extends JobContext> clazz;
+    if (!JobContext.class.isInterface()) {
+      clazz = JobContext.class;
+    } else {
+      clazz = (Class<? extends JobContext>)
+          Class.forName("org.apache.hadoop.mapreduce.task.JobContextImpl");
+    }
+    return clazz.getConstructor(Configuration.class, JobID.class)
+        .newInstance(conf, jobID);
   }
 }

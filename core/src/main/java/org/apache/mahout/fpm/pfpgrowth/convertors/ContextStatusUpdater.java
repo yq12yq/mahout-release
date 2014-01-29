@@ -28,7 +28,6 @@ import org.apache.hadoop.mapreduce.Reducer;
  * @param <K>
  * @param <V>
  */
-@Deprecated
 public class ContextStatusUpdater<IK extends Writable,IV extends Writable,K extends Writable,V extends Writable>
     implements StatusUpdater {
   

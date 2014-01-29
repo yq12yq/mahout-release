@@ -38,7 +38,6 @@ import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.Parameters;
 import org.apache.mahout.common.iterator.FileLineIterable;
 import org.apache.mahout.common.iterator.StringRecordIterator;
-import org.apache.mahout.fpm.pfpgrowth.convertors.StatusUpdater;
 import org.apache.mahout.fpm.pfpgrowth.convertors.string.TopKStringPatterns;
 import org.apache.mahout.fpm.pfpgrowth.fpgrowth2.FPGrowthObj;
 import org.junit.Test;
@@ -47,7 +46,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Resources;
 
-@Deprecated
 public class PFPGrowthSynthDataTest2 extends MahoutTestCase {
   
   private final Parameters params = new Parameters();
@@ -57,7 +55,7 @@ public class PFPGrowthSynthDataTest2 extends MahoutTestCase {
   public void setUp() throws Exception {
     super.setUp();
     params.set(PFPGrowth.MIN_SUPPORT, "100");
-    params.set(PFPGrowth.MAX_HEAPSIZE, "10000");
+    params.set(PFPGrowth.MAX_HEAP_SIZE, "10000");
     params.set(PFPGrowth.NUM_GROUPS, "50");
     params.set(PFPGrowth.ENCODING, "UTF-8");
     params.set(PFPGrowth.USE_FPG2, "true");
@@ -131,10 +129,6 @@ public class PFPGrowthSynthDataTest2 extends MahoutTestCase {
           }
         }
         
-      }, new StatusUpdater() {
-        
-        @Override
-        public void update(String status) {}
       });
 
     for (Entry<Set<String>,Long> entry : parallelResult.entrySet()) {

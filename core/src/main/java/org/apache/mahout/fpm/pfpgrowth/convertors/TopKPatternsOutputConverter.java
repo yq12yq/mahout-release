@@ -35,7 +35,6 @@ import org.apache.mahout.fpm.pfpgrowth.fpgrowth.Pattern;
  * 
  * @param <A>
  */
-@Deprecated
 public final class TopKPatternsOutputConverter<A extends Comparable<? super A>> implements
     OutputCollector<Integer,FrequentPatternMaxHeap> {
   

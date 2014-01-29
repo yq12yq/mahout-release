@@ -99,7 +99,7 @@ public class AdaptiveLogisticRegression implements OnlineLearner, Writable {
    * @param numFeatures The number of features used in creating the vectors (i.e. the cardinality of the vector)
    * @param prior The {@link org.apache.mahout.classifier.sgd.PriorFunction} to use
    *
-   * @see {@link #AdaptiveLogisticRegression(int, int, org.apache.mahout.classifier.sgd.PriorFunction, int, int)}
+   * @see #AdaptiveLogisticRegression(int, int, org.apache.mahout.classifier.sgd.PriorFunction, int, int)
    */
   public AdaptiveLogisticRegression(int numCategories, int numFeatures, PriorFunction prior) {
     this(numCategories, numFeatures, prior, DEFAULT_THREAD_COUNT, DEFAULT_POOL_SIZE);
@@ -234,11 +234,12 @@ public class AdaptiveLogisticRegression implements OnlineLearner, Writable {
           return learner.logLikelihood();
         }
       });
-      ep.close();
     } catch (InterruptedException e) {
       log.warn("Ignoring exception", e);
     } catch (ExecutionException e) {
       throw new IllegalStateException(e);
+    } finally {
+      ep.close();
     }
   }
 

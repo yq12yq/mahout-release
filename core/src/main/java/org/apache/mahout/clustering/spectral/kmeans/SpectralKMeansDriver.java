@@ -32,10 +32,10 @@ import org.apache.mahout.clustering.Cluster;
 import org.apache.mahout.clustering.classify.WeightedVectorWritable;
 import org.apache.mahout.clustering.kmeans.EigenSeedGenerator;
 import org.apache.mahout.clustering.kmeans.KMeansDriver;
-import org.apache.mahout.clustering.spectral.common.AffinityMatrixInputJob;
-import org.apache.mahout.clustering.spectral.common.MatrixDiagonalizeJob;
-import org.apache.mahout.clustering.spectral.common.UnitVectorizerJob;
-import org.apache.mahout.clustering.spectral.common.VectorMatrixMultiplicationJob;
+import org.apache.mahout.clustering.spectral.AffinityMatrixInputJob;
+import org.apache.mahout.clustering.spectral.MatrixDiagonalizeJob;
+import org.apache.mahout.clustering.spectral.UnitVectorizerJob;
+import org.apache.mahout.clustering.spectral.VectorMatrixMultiplicationJob;
 import org.apache.mahout.common.AbstractJob;
 import org.apache.mahout.common.ClassUtils;
 import org.apache.mahout.common.HadoopUtil;
@@ -152,6 +152,7 @@ public class SpectralKMeansDriver extends AbstractJob {
    * @param ssvd
    *          Flag to indicate the eigensolver to use
    * @param numReducers
+   *          Number of reducers
    * @param blockHeight
    * @param oversampling
    * @param poweriters
@@ -244,7 +245,7 @@ public class SpectralKMeansDriver extends AbstractJob {
 
     // Run the KMeansDriver
     Path answer = new Path(output, "kmeans_out");
-    KMeansDriver.run(conf, data, initialclusters, answer, measure, convergenceDelta, maxIterations, true, 0.0, false);
+    KMeansDriver.run(conf, data, initialclusters, answer, convergenceDelta, maxIterations, true, 0.0, false);
 
     // Restore name to id mapping and read through the cluster assignments
     Path mappingPath = new Path(new Path(conf.get("hadoop.tmp.dir")), "generic_input_mapping");

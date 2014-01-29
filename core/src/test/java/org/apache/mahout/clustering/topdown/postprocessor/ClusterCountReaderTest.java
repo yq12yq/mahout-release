@@ -56,7 +56,7 @@ public final class ClusterCountReaderTest extends MahoutTestCase {
   @Before
   public void setUp() throws Exception {
     super.setUp();
-    Configuration conf = new Configuration();
+    Configuration conf = getConfiguration();
     fs = FileSystem.get(conf);
   }
   
@@ -79,7 +79,7 @@ public final class ClusterCountReaderTest extends MahoutTestCase {
     List<VectorWritable> points = getPointsWritable(REFERENCE);
     
     Path pointsPath = getTestTempDirPath("points");
-    Configuration conf = new Configuration();
+    Configuration conf = getConfiguration();
     ClusteringTestUtils.writePointsToFile(points, new Path(pointsPath, "file1"), fs, conf);
     ClusteringTestUtils.writePointsToFile(points, new Path(pointsPath, "file2"), fs, conf);
     
@@ -101,7 +101,7 @@ public final class ClusterCountReaderTest extends MahoutTestCase {
     CanopyDriver.run(conf, pointsPath, outputPathForCanopy, measure, 4.0, 3.0, true, 0.0, true);
     Path clustersIn = new Path(outputPathForCanopy, new Path(Cluster.CLUSTERS_DIR + '0'
                                                                    + Cluster.FINAL_ITERATION_SUFFIX));
-    KMeansDriver.run(conf, pointsPath, clustersIn, outputPathForKMeans, measure, 1, 1, true, 0.0, true);
+    KMeansDriver.run(conf, pointsPath, clustersIn, outputPathForKMeans, 1, 1, true, 0.0, true);
   }
   
   private static void verifyThatNumberOfClustersIsCorrect(Configuration conf, Path clusteredPointsPath) {

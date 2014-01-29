@@ -19,8 +19,8 @@ package org.apache.mahout.text;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
-import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.apache.lucene.index.*;
 import org.apache.mahout.common.HadoopUtil;
 
@@ -29,20 +29,27 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import static java.util.Arrays.asList;
+import static org.apache.mahout.text.doc.SingleFieldDocument.*;
 
 public class LuceneSegmentRecordReaderTest extends AbstractLuceneStorageTest {
   private Configuration configuration;
 
+  private LuceneSegmentRecordReader recordReader;
+
+  private SegmentInfos segmentInfos;
 
   @Before
   public void before() throws IOException, InterruptedException {
-    LuceneStorageConfiguration lucene2SeqConf = new LuceneStorageConfiguration(new Configuration(), asList(getIndexPath1()), new Path("output"), "id", asList("field"));
-    configuration = lucene2SeqConf.serializeToConfiguration();
+    LuceneStorageConfiguration lucene2SeqConf = new LuceneStorageConfiguration(getConfiguration(), asList(getIndexPath1()), new Path("output"), ID_FIELD, asList(FIELD));
+    configuration = lucene2SeqConf.serialize();
+    recordReader = new LuceneSegmentRecordReader();
     commitDocuments(getDirectory(getIndexPath1AsFile()), docs.subList(0, 500));
     commitDocuments(getDirectory(getIndexPath1AsFile()), docs.subList(500, 1000));
-
+    segmentInfos = new SegmentInfos();
+    segmentInfos.read(getDirectory(getIndexPath1AsFile()));
   }
 
   @After
@@ -52,13 +59,10 @@ public class LuceneSegmentRecordReaderTest extends AbstractLuceneStorageTest {
 
   @Test
   public void testKey() throws Exception {
-    LuceneSegmentRecordReader recordReader = new LuceneSegmentRecordReader();
-    SegmentInfos segmentInfos = new SegmentInfos();
-    segmentInfos.read(getDirectory(getIndexPath1AsFile()));
-    for (SegmentInfoPerCommit segmentInfo : segmentInfos) {
+    for (SegmentCommitInfo segmentInfo : segmentInfos) {
       int docId = 0;
       LuceneSegmentInputSplit inputSplit = new LuceneSegmentInputSplit(getIndexPath1(), segmentInfo.info.name, segmentInfo.sizeInBytes());
-        TaskAttemptContextImpl context = new TaskAttemptContextImpl(configuration, new TaskAttemptID());
+      TaskAttemptContext context = getTaskAttemptContext(configuration, new TaskAttemptID());
       recordReader.initialize(inputSplit, context);
       for (int i = 0; i < 500; i++){
         recordReader.nextKeyValue();
@@ -68,5 +72,38 @@ public class LuceneSegmentRecordReaderTest extends AbstractLuceneStorageTest {
         docId++;
       }
     }
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNonExistingIdField() throws Exception {
+    configuration = new LuceneStorageConfiguration(getConfiguration(), asList(getIndexPath1()), new Path("output"), "nonExistingId", asList(FIELD)).serialize();
+    SegmentCommitInfo segmentInfo = segmentInfos.iterator().next();
+    LuceneSegmentInputSplit inputSplit = new LuceneSegmentInputSplit(getIndexPath1(), segmentInfo.info.name, segmentInfo.sizeInBytes());
+    TaskAttemptContext context = getTaskAttemptContext(configuration, new TaskAttemptID());
+    recordReader.initialize(inputSplit, context);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNonExistingField() throws Exception {
+    configuration = new LuceneStorageConfiguration(getConfiguration(), asList(getIndexPath1()), new Path("output"), ID_FIELD, asList("nonExistingField")).serialize();
+    SegmentCommitInfo segmentInfo = segmentInfos.iterator().next();
+    LuceneSegmentInputSplit inputSplit = new LuceneSegmentInputSplit(getIndexPath1(), segmentInfo.info.name, segmentInfo.sizeInBytes());
+    TaskAttemptContext context = getTaskAttemptContext(configuration, new TaskAttemptID());
+    recordReader.initialize(inputSplit, context);
+  }
+
+  // Use reflection to abstract this incompatibility between Hadoop 1 & 2 APIs.
+  private TaskAttemptContext getTaskAttemptContext(Configuration conf, TaskAttemptID jobID) throws
+      ClassNotFoundException, NoSuchMethodException, IllegalAccessException,
+      InvocationTargetException, InstantiationException {
+    Class<? extends TaskAttemptContext> clazz;
+    if (!TaskAttemptContext.class.isInterface()) {
+      clazz = TaskAttemptContext.class;
+    } else {
+      clazz = (Class<? extends TaskAttemptContext>)
+          Class.forName("org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl");
+    }
+    return clazz.getConstructor(Configuration.class, TaskAttemptID.class)
+        .newInstance(conf, jobID);
   }
 }

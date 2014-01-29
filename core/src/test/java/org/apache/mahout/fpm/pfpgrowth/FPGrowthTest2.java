@@ -32,14 +32,12 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.OutputCollector;
 import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.Pair;
-import org.apache.mahout.fpm.pfpgrowth.convertors.ContextStatusUpdater;
 import org.apache.mahout.fpm.pfpgrowth.convertors.SequenceFileOutputCollector;
 import org.apache.mahout.fpm.pfpgrowth.convertors.string.StringOutputConverter;
 import org.apache.mahout.fpm.pfpgrowth.convertors.string.TopKStringPatterns;
 import org.apache.mahout.fpm.pfpgrowth.fpgrowth2.FPGrowthObj;
 import org.junit.Test;
 
-@Deprecated
 public final class FPGrowthTest2 extends MahoutTestCase {
 
   @Test
@@ -70,8 +68,8 @@ public final class FPGrowthTest2 extends MahoutTestCase {
         3,
         100,
         Sets.<String>newHashSet(),
-        new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer)),
-        new ContextStatusUpdater(null));
+        new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer))
+    );
     } finally {
       Closeables.close(writer, false);
     }
@@ -113,8 +111,8 @@ public final class FPGrowthTest2 extends MahoutTestCase {
           2,
           100,
           Sets.<String>newHashSet(),
-          new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer)),
-          new ContextStatusUpdater(null));
+          new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer))
+      );
     } finally {
       Closeables.close(writer, false);
     }
@@ -151,8 +149,8 @@ public final class FPGrowthTest2 extends MahoutTestCase {
           2,
           100,
           Sets.<String>newHashSet(),
-          new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer)),
-          new ContextStatusUpdater(null));
+          new StringOutputConverter(new SequenceFileOutputCollector<Text,TopKStringPatterns>(writer))
+      );
     } finally {
       Closeables.close(writer, false);
     }
@@ -187,7 +185,7 @@ public final class FPGrowthTest2 extends MahoutTestCase {
         3,
         100,
         null,
-        noOutput,
-        new ContextStatusUpdater(null));
+        noOutput
+    );
   }
 }

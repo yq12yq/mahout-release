@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Deque;
-import java.util.LinkedList;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
@@ -72,7 +71,7 @@ public class LocalSSVDSolverSparseSequentialTest extends MahoutTestCase {
 
   public void runSSVDSolver(int q) throws IOException {
 
-    Configuration conf = new Configuration();
+    Configuration conf = getConfiguration();
     conf.set("mapred.job.tracker", "local");
     conf.set("fs.default.name", "file:///");
 
@@ -164,12 +163,12 @@ public class LocalSSVDSolverSparseSequentialTest extends MahoutTestCase {
     System.out.println("--Colt SVD solver singular values:");
 
     // try to run the same thing without stochastic algo
-    double[][] a = SSVDHelper.loadDistributedRowMatrix(fs, aPath, conf);
+    DenseMatrix a = SSVDHelper.drmLoadAsDense(fs, aPath, conf);
 
     // SingularValueDecompositionImpl svd=new SingularValueDecompositionImpl(new
     // Array2DRowRealMatrix(a));
     SingularValueDecomposition svd2 =
-      new SingularValueDecomposition(new DenseMatrix(a));
+      new SingularValueDecomposition(a);
 
     Vector svalues2 = new DenseVector(svd2.getSingularValues());
     dumpSv(svalues2);
@@ -178,13 +177,13 @@ public class LocalSSVDSolverSparseSequentialTest extends MahoutTestCase {
       assertTrue(Math.abs(svalues2.getQuick(i) - stochasticSValues.getQuick(i)) <= s_epsilon);
     }
 
-    double[][] mQ =
-      SSVDHelper.loadDistributedRowMatrix(fs, new Path(svdOutPath, "Bt-job/"
-          + BtJob.OUTPUT_Q + "-*"), conf);
+    DenseMatrix mQ =
+      SSVDHelper.drmLoadAsDense(fs, new Path(svdOutPath, "Bt-job/"
+        + BtJob.OUTPUT_Q + "-*"), conf);
 
-    SSVDCommonTest.assertOrthonormality(new DenseMatrix(mQ),
-                                           false,
-                                           s_epsilon);
+    SSVDCommonTest.assertOrthonormality(mQ,
+                                        false,
+                                        s_epsilon);
 
     IOUtils.close(closeables);
   }

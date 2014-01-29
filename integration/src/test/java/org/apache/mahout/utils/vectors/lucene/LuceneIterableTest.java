@@ -20,10 +20,14 @@ package org.apache.mahout.utils.vectors.lucene;
 import java.io.IOException;
 import java.util.Iterator;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.io.Closeables;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -31,12 +35,13 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.math.NamedVector;
 import org.apache.mahout.math.Vector;
-import org.apache.mahout.utils.MahoutTestCase;
 import org.apache.mahout.utils.vectors.TermInfo;
 import org.apache.mahout.vectorizer.TFIDF;
 import org.apache.mahout.vectorizer.Weight;
+import org.junit.Before;
 import org.junit.Test;
 
 public final class LuceneIterableTest extends MahoutTestCase {
@@ -51,10 +56,29 @@ public final class LuceneIterableTest extends MahoutTestCase {
 
   private RAMDirectory directory;
 
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    directory = createTestIndex(Field.TermVector.YES);
+  private final FieldType TYPE_NO_TERM_VECTORS = new FieldType();
+
+  private final FieldType TYPE_TERM_VECTORS = new FieldType();
+
+  @Before
+  public void before() throws IOException {
+
+    TYPE_NO_TERM_VECTORS.setIndexed(true);
+    TYPE_NO_TERM_VECTORS.setTokenized(true);
+    TYPE_NO_TERM_VECTORS.setStoreTermVectors(false);
+    TYPE_NO_TERM_VECTORS.setStoreTermVectorPositions(false);
+    TYPE_NO_TERM_VECTORS.setStoreTermVectorOffsets(false);
+    TYPE_NO_TERM_VECTORS.freeze();
+
+    TYPE_TERM_VECTORS.setIndexed(true);
+    TYPE_TERM_VECTORS.setTokenized(true);
+    TYPE_TERM_VECTORS.setStored(true);
+    TYPE_TERM_VECTORS.setStoreTermVectors(true);
+    TYPE_TERM_VECTORS.setStoreTermVectorPositions(true);
+    TYPE_TERM_VECTORS.setStoreTermVectorOffsets(true);
+    TYPE_TERM_VECTORS.freeze();
+
+    directory = createTestIndex(TYPE_TERM_VECTORS);
   }
 
   @Test
@@ -86,25 +110,23 @@ public final class LuceneIterableTest extends MahoutTestCase {
 
   @Test(expected = IllegalStateException.class)
   public void testIterableNoTermVectors() throws IOException {
-    RAMDirectory directory = createTestIndex(Field.TermVector.NO);
+    RAMDirectory directory = createTestIndex(TYPE_NO_TERM_VECTORS);
     IndexReader reader = DirectoryReader.open(directory);
-    
-    
+
     Weight weight = new TFIDF();
     TermInfo termInfo = new CachedTermInfo(reader, "content", 1, 100);
     LuceneIterable iterable = new LuceneIterable(reader, "id", "content",  termInfo,weight);
 
     Iterator<Vector> iterator = iterable.iterator();
-    iterator.hasNext();
-    iterator.next();
+    Iterators.advance(iterator, 1);
   }
 
   @Test
   public void testIterableSomeNoiseTermVectors() throws IOException {
     //get noise vectors
-    RAMDirectory directory = createTestIndex(Field.TermVector.YES, new RAMDirectory(), true, 0);
+    RAMDirectory directory = createTestIndex(TYPE_TERM_VECTORS, new RAMDirectory(), 0);
     //get real vectors
-    createTestIndex(Field.TermVector.NO, directory, false, 5);
+    createTestIndex(TYPE_NO_TERM_VECTORS, directory, 5);
     IndexReader reader = DirectoryReader.open(directory);
 
     Weight weight = new TFIDF();
@@ -112,10 +134,9 @@ public final class LuceneIterableTest extends MahoutTestCase {
     
     boolean exceptionThrown;
     //0 percent tolerance
-    LuceneIterable iterable = new LuceneIterable(reader, "id", "content", termInfo,weight);
+    LuceneIterable iterable = new LuceneIterable(reader, "id", "content", termInfo, weight);
     try {
-      for (Object a : iterable) {
-      }
+      Iterables.skip(iterable, Iterables.size(iterable));
       exceptionThrown = false;
     }
     catch(IllegalStateException ise) {
@@ -126,8 +147,7 @@ public final class LuceneIterableTest extends MahoutTestCase {
     //100 percent tolerance
     iterable = new LuceneIterable(reader, "id", "content", termInfo,weight, -1, 1.0);
     try {
-      for (Object a : iterable) {
-      }
+      Iterables.skip(iterable, Iterables.size(iterable));
       exceptionThrown = false;
     }
     catch(IllegalStateException ise) {
@@ -138,44 +158,36 @@ public final class LuceneIterableTest extends MahoutTestCase {
     //50 percent tolerance
     iterable = new LuceneIterable(reader, "id", "content", termInfo,weight, -1, 0.5);
     Iterator<Vector> iterator = iterable.iterator();
-    iterator.next();
-    iterator.next();
-    iterator.next();
-    iterator.next();
-    iterator.next();
+    Iterators.advance(iterator, 5);
 
     try {
-        while (iterator.hasNext()) {
-            iterator.next();
-        }
-        exceptionThrown = false;
+      Iterators.advance(iterator, Iterators.size(iterator));
+      exceptionThrown = false;
     }
     catch(IllegalStateException ise) {
-        exceptionThrown = true;
+      exceptionThrown = true;
     }
     assertTrue(exceptionThrown);
   }
   
-  static RAMDirectory createTestIndex(Field.TermVector termVector) throws IOException {
-      return createTestIndex(termVector, new RAMDirectory(), true, 0);
+  static RAMDirectory createTestIndex(FieldType fieldType) throws IOException {
+      return createTestIndex(fieldType, new RAMDirectory(), 0);
   }
   
-  static RAMDirectory createTestIndex(Field.TermVector termVector,
+  static RAMDirectory createTestIndex(FieldType fieldType,
                                               RAMDirectory directory,
-                                              boolean createNew,
                                               int startingId) throws IOException {
-    IndexWriter writer = new IndexWriter( directory, new IndexWriterConfig(Version.LUCENE_43,new StandardAnalyzer(Version.LUCENE_43)));
-        
+    IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(Version.LUCENE_46,new StandardAnalyzer(Version.LUCENE_46)));
+
     try {
       for (int i = 0; i < DOCS.length; i++) {
         Document doc = new Document();
         Field id = new StringField("id", "doc_" + (i + startingId), Field.Store.YES);
         doc.add(id);
         //Store both position and offset information
-        //Says it is deprecated, but doesn't seem to offer an alternative that supports term vectors...
-        Field text = new Field("content", DOCS[i], Field.Store.NO, Field.Index.ANALYZED, termVector);
+        Field text = new Field("content", DOCS[i], fieldType);
         doc.add(text);
-        Field text2 = new Field("content2", DOCS[i], Field.Store.NO, Field.Index.ANALYZED, termVector);
+        Field text2 = new Field("content2", DOCS[i], fieldType);
         doc.add(text2);
         writer.addDocument(doc);
       }

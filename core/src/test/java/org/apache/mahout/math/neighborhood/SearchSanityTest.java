@@ -17,12 +17,15 @@
 
 package org.apache.mahout.math.neighborhood;
 
+
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
 import org.apache.mahout.common.MahoutTestCase;
+import org.apache.mahout.common.RandomUtils;
 import org.apache.mahout.common.distance.EuclideanDistanceMeasure;
 import org.apache.mahout.math.DenseMatrix;
 import org.apache.mahout.math.DenseVector;
@@ -35,6 +38,9 @@ import org.apache.mahout.math.random.WeightedThing;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 @RunWith(Parameterized.class)
 public class SearchSanityTest extends MahoutTestCase {
@@ -57,6 +63,7 @@ public class SearchSanityTest extends MahoutTestCase {
 
   @Parameterized.Parameters
   public static List<Object[]> generateData() {
+    RandomUtils.useTestSeed();
     Matrix dataPoints = multiNormalRandomData(NUM_DATA_POINTS, NUM_DIMENSIONS);
     return Arrays.asList(new Object[][]{
         {new ProjectionSearch(new EuclideanDistanceMeasure(), NUM_PROJECTIONS, SEARCH_SIZE), dataPoints},
@@ -201,6 +208,17 @@ public class SearchSanityTest extends MahoutTestCase {
       assertEquals("First isn't self", datapoint, first.getValue());
       assertEquals("First doesn't match", first, firstTwo.get(0));
       assertEquals("Second doesn't match", second, firstTwo.get(1));
+    }
+  }
+
+  @Test
+  public void testSearchLimiting() {
+    searcher.clear();
+    searcher.addAll(dataPoints);
+    for (Vector datapoint : dataPoints) {
+      List<WeightedThing<Vector>> firstTwo = searcher.search(datapoint, 2);
+
+      assertThat("Search limit isn't respected", firstTwo.size(), is(lessThanOrEqualTo(2)));
     }
   }
 

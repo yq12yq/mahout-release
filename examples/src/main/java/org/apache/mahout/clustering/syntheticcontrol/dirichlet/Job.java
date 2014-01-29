@@ -42,7 +42,6 @@ public final class Job extends AbstractJob {
   private static final Logger log = LoggerFactory.getLogger(Job.class);
   
   private static final String DIRECTORY_CONTAINING_CONVERTED_INPUT = "data";
-  private static final String WINDOWS_OS = "Windows";
   
   private Job() {
   }
@@ -53,19 +52,11 @@ public final class Job extends AbstractJob {
       ToolRunner.run(new Configuration(), new Job(), args);
     } else {
       log.info("Running with default arguments");
-      Path output;
-      Path input;
-      if(System.getProperty("os.name").startsWith(WINDOWS_OS)){
-          output = new Path("/user/" + System.getProperty("user.name") + "/output");
-          input = new Path("/user/" + System.getProperty("user.name") + "/testdata");
-      } else {
-          output = new Path("output");
-          input = new Path("testdata");
-      }
+      Path output = new Path("output");
       HadoopUtil.delete(new Configuration(), output);
       DistributionDescription description = new DistributionDescription(GaussianClusterDistribution.class.getName(),
           RandomAccessSparseVector.class.getName(), null, 60);
-      run(input, output, description, 10, 5, 1.0, true, 0);
+      run(new Path("testdata"), output, description, 10, 5, 1.0, true, 0);
     }
   }
   

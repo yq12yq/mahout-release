@@ -33,6 +33,14 @@ if [ "$0" != "$SCRIPT_PATH" ] && [ "$SCRIPT_PATH" != "" ]; then
 fi
 START_PATH=`pwd`
 
+if [ "$HADOOP_HOME" != "" ] && [ "$MAHOUT_LOCAL" == "" ] ; then
+  HADOOP="$HADOOP_HOME/bin/hadoop"
+  if [ ! -e $HADOOP ]; then
+    echo "Can't find hadoop in $HADOOP, exiting"
+    exit 1
+  fi
+fi
+
 WORK_DIR=/tmp/mahout-work-${USER}
 algorithm=( cnaivebayes naivebayes sgd clean)
 if [ -n "$1" ]; then
@@ -49,18 +57,20 @@ fi
 echo "ok. You chose $choice and we'll use ${algorithm[$choice-1]}"
 alg=${algorithm[$choice-1]}
 
-echo "creating work directory at ${WORK_DIR}"
+if [ "x$alg" != "xclean" ]; then
+  echo "creating work directory at ${WORK_DIR}"
 
-mkdir -p ${WORK_DIR}
-if [ ! -e ${WORK_DIR}/20news-bayesinput ]; then
-  if [ ! -e ${WORK_DIR}/20news-bydate ]; then
-    if [ ! -f ${WORK_DIR}/20news-bydate.tar.gz ]; then
-      echo "Downloading 20news-bydate"
-      curl http://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz -o ${WORK_DIR}/20news-bydate.tar.gz
+  mkdir -p ${WORK_DIR}
+  if [ ! -e ${WORK_DIR}/20news-bayesinput ]; then
+    if [ ! -e ${WORK_DIR}/20news-bydate ]; then
+      if [ ! -f ${WORK_DIR}/20news-bydate.tar.gz ]; then
+        echo "Downloading 20news-bydate"
+        curl http://people.csail.mit.edu/jrennie/20Newsgroups/20news-bydate.tar.gz -o ${WORK_DIR}/20news-bydate.tar.gz
+      fi
+      mkdir -p ${WORK_DIR}/20news-bydate
+      echo "Extracting..."
+      cd ${WORK_DIR}/20news-bydate && tar xzf ../20news-bydate.tar.gz && cd .. && cd ..
     fi
-    mkdir -p ${WORK_DIR}/20news-bydate
-    echo "Extracting..."
-    cd ${WORK_DIR}/20news-bydate && tar xzf ../20news-bydate.tar.gz && cd .. && cd ..
   fi
 fi
 #echo $START_PATH
@@ -81,6 +91,14 @@ if [ "x$alg" == "xnaivebayes"  -o  "x$alg" == "xcnaivebayes" ]; then
   rm -rf ${WORK_DIR}/20news-all
   mkdir ${WORK_DIR}/20news-all
   cp -R ${WORK_DIR}/20news-bydate/*/* ${WORK_DIR}/20news-all
+
+  if [ "$HADOOP_HOME" != "" ] && [ "$MAHOUT_LOCAL" == "" ] ; then
+    echo "Copying 20newsgroups data to HDFS"
+    set +e
+    $HADOOP dfs -rmr ${WORK_DIR}/20news-all
+    set -e
+    $HADOOP dfs -put ${WORK_DIR}/20news-all ${WORK_DIR}/20news-all
+  fi
 
   echo "Creating sequence files from 20newsgroups data"
   ./bin/mahout seqdirectory \

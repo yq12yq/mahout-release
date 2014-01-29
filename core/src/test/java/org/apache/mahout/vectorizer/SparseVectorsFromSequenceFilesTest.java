@@ -18,9 +18,9 @@
 package org.apache.mahout.vectorizer;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import org.apache.hadoop.conf.Configuration;
@@ -37,6 +37,7 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 import org.junit.Test;
 
+@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
 public class SparseVectorsFromSequenceFilesTest extends MahoutTestCase {
 
   private static final int NUM_DOCS = 100;

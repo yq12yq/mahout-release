@@ -34,7 +34,9 @@ import org.apache.hadoop.mrunit.mapreduce.ReduceDriver;
 import org.apache.mahout.clustering.ClusteringUtils;
 import org.apache.mahout.clustering.streaming.cluster.DataUtils;
 import org.apache.mahout.clustering.streaming.cluster.StreamingKMeans;
+import org.apache.mahout.common.MahoutTestCase;
 import org.apache.mahout.common.Pair;
+import org.apache.mahout.common.RandomUtils;
 import org.apache.mahout.common.commandline.DefaultOptionCreator;
 import org.apache.mahout.common.distance.SquaredEuclideanDistanceMeasure;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterable;
@@ -46,6 +48,7 @@ import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.LocalitySensitiveHashSearch;
 import org.apache.mahout.math.neighborhood.ProjectionSearch;
 import org.apache.mahout.math.random.WeightedThing;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -54,7 +57,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-public class StreamingKMeansTestMR {
+public class StreamingKMeansTestMR extends MahoutTestCase {
   private static final int NUM_DATA_POINTS = 1 << 15;
   private static final int NUM_DIMENSIONS = 8;
   private static final int NUM_PROJECTIONS = 3;
@@ -62,8 +65,14 @@ public class StreamingKMeansTestMR {
   private static final int MAX_NUM_ITERATIONS = 10;
   private static final double DISTANCE_CUTOFF = 1.0e-6;
 
-  private static final Pair<List<Centroid>, List<Centroid>> syntheticData =
+  private static Pair<List<Centroid>, List<Centroid>> syntheticData;
+
+  @Before
+  public void setUp() {
+    RandomUtils.useTestSeed();
+    syntheticData =
       DataUtils.sampleMultiNormalHypercube(NUM_DIMENSIONS, NUM_DATA_POINTS, 1.0e-4);
+  }
 
   private final String searcherClassName;
   private final String distanceMeasureClassName;
@@ -224,7 +233,7 @@ public class StreamingKMeansTestMR {
 
   @Test
   public void testHypercubeMapReduceRunSequentially() throws Exception {
-    Configuration configuration = new Configuration();
+    Configuration configuration = getConfiguration();
     configure(configuration);
     configuration.set(DefaultOptionCreator.METHOD_OPTION, DefaultOptionCreator.SEQUENTIAL_METHOD);
 
