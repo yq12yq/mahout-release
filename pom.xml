@@ -20,7 +20,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mahout</groupId>
   <artifactId>mahout</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.9.0</version>
 
   <parent>
     <groupId>org.apache</groupId>
@@ -106,9 +106,9 @@
     <mjavadoc.version>2.9.1</mjavadoc.version>
     <lucene.version>4.6.1</lucene.version>
     <slf4j.version>1.7.5</slf4j.version>
-    <hadoop.2.version>2.1.0</hadoop.2.version>
+    <hadoop.2.version>2.2.0</hadoop.2.version>
     <hadoop.1.version>1.1.2</hadoop.1.version>
-    <hbase.version>0.95.0</hbase.version>
+    <hbase.version>0.95.1-hadoop1</hbase.version>
   </properties>
   <issueManagement>
     <system>Jira</system>
@@ -760,11 +760,8 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
-                      <forkCount>1</forkCount>
+                      <forkCount>1.5C</forkCount>
                       <reuseForks>false</reuseForks>
-                      <threadCount>1</threadCount>
-                      <perCoreThreadCount>false</perCoreThreadCount>
-                      <parallel>classes</parallel>
                       <argLine>-Xmx512m</argLine>
                       <testFailureIgnore>false</testFailureIgnore>
                       <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -894,11 +891,8 @@
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-surefire-plugin</artifactId>
                   <configuration>
-                      <forkCount>1</forkCount>
+                      <forkCount>1.5C</forkCount>
                       <reuseForks>false</reuseForks>
-                      <threadCount>1</threadCount>
-                      <perCoreThreadCount>false</perCoreThreadCount>
-                      <parallel>classes</parallel>
                       <argLine>-Xmx512m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
                       <testFailureIgnore>false</testFailureIgnore>
                       <redirectTestOutputToFile>true</redirectTestOutputToFile>

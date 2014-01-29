@@ -25,7 +25,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DefaultStringifier;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.JobConf;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.DocumentStoredFieldVisitor;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -129,28 +128,16 @@ public class LuceneStorageConfiguration implements Writable {
   }
 
   /**
-   * Serializes this object in a Hadoop2 {@link Configuration}
+   * Serializes this object in a Hadoop {@link Configuration}
    *
    * @return a {@link Configuration} object with a String serialization
    * @throws IOException if serialization fails
    */
-  public JobConf serializeToJobConf() throws IOException {
+  public Configuration serialize() throws IOException {
     DefaultStringifier.store(configuration, this, KEY);
 
-    return new JobConf(configuration);
+    return new Configuration(configuration);
   }
-
-    /**
-     * Serializes this object in a Hadoop1 {@link Configuration}
-     *
-     * @return a {@link Configuration} object with a String serialization
-     * @throws IOException if serialization fails
-     */
-    public Configuration serializeToConfiguration() throws IOException {
-        DefaultStringifier.store(configuration, this, KEY);
-
-        return new Configuration(configuration);
-    }
 
   /**
    * Returns an {@link Iterator} which returns (Text, Text) {@link Pair}s of the produced sequence files.
@@ -159,7 +146,7 @@ public class LuceneStorageConfiguration implements Writable {
    */
   public Iterator<Pair<Text, Text>> getSequenceFileIterator() {
     return new SequenceFileDirIterable<Text, Text>(sequenceFilesOutputPath, PathType.LIST, PathFilters.logsCRCFilter(),
-                                                   configuration).iterator();
+        configuration).iterator();
   }
 
   public Configuration getConfiguration() {
