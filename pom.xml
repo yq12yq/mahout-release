@@ -1116,6 +1116,11 @@
       <id>Website</id>
       <url>scp://people.apache.org/home/isabel/public_html/mahout_site</url>
     </site>
+    <repository>
+          <id>${repoid}</id>
+          <name>${reponame}</name>
+          <url>${repourl}</url>
+    </repository>
   </distributionManagement>
   <reporting>
     <plugins>
