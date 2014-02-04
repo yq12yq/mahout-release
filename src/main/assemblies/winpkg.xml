@@ -1,0 +1,33 @@
+<assembly>
+    <id>${project.version}.winpkg</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <!-- resources -->
+        <fileSet>
+            <directory>${basedir}/src/resources</directory>
+            <outputDirectory>/resources</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet>
+        <!-- scripts -->
+        <fileSet>
+            <directory>${basedir}/src/scripts</directory>
+            <outputDirectory>/scripts</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet>
+        <!-- Mahout Zip -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <outputDirectory>/resources</outputDirectory>
+            <includes>
+                <include>**/mahout-${project.version}.zip</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

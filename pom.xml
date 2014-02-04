@@ -523,11 +523,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <version>2.4</version>
         </plugin>
@@ -585,6 +580,14 @@
               <version>${project.version}</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <configuration>
+            <descriptors>
+              <descriptor>src/main/assemblies/empty.xml</descriptor>
+            </descriptors>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -981,6 +984,45 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>winpkg</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>winpkg</module>
+      </modules>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <version>1.5.2</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <includes>
+                <include>winpkg/src/scripts/*</include>
+              </includes>
+              <excludes>
+                <exclude>win-distro/src/scripts/*.exe</exclude>
+              </excludes>
+              <replacements>
+                <replacement>
+                  <token>@mahout.version@</token>
+                  <value>${project.version}</value>
+                </replacement>
+              </replacements>
+            </configuration>
           </plugin>
         </plugins>
       </build>
