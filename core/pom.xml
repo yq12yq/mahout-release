@@ -140,11 +140,7 @@
       <artifactId>slf4j-jcl</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-       <groupId>log4j</groupId>
-       <artifactId>log4j</artifactId>
-       <version>1.2.17</version>
-    </dependency>
+
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -212,83 +208,45 @@
       <artifactId>solr-commons-csv</artifactId>
       <version>3.5.0</version>
     </dependency>
+
   </dependencies>
-
+  
   <profiles>
-     <profile>
-       <id>hadoop2</id>
-          <activation>
-              <property>
-                  <name>hadoop.profile</name>
-                  <value>200</value>
-              </property>
-          </activation>
-          <dependencies>
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-auth</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-common</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-mapreduce-client-common</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-mapreduce-client-core</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-yarn-common</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.hadoop</groupId>
-                  <artifactId>hadoop-yarn-api</artifactId>
-                  <version>${hadoop.version}</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>commons-httpclient</groupId>
-                  <artifactId>commons-httpclient</artifactId>
-                  <version>3.1</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>org.apache.commons</groupId>
-                  <artifactId>commons-math</artifactId>
-                  <version>2.1</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-                  <version>2.4</version>
-              </dependency>
-
-              <dependency>
-                  <groupId>commons-configuration</groupId>
-                  <artifactId>commons-configuration</artifactId>
-                  <version>1.9</version>
-              </dependency>
-              <dependency>
-                  <groupId>org.apache.avro</groupId>
-                  <artifactId>avro</artifactId>
-                  <version>1.7.5</version>
-              </dependency>
-         </dependencies>
-      </profile>
+    <profile>
+      <id>hadoop1</id>
+      <activation>
+        <property>
+          <name>!hadoop2.version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-core</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>hadoop2</id>
+      <activation>
+        <property>
+          <name>hadoop2.version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-common</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-mapreduce-client-core</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 </project>
