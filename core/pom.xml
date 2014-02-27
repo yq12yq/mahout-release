@@ -216,7 +216,7 @@
       <id>hadoop1</id>
       <activation>
         <property>
-          <name>!hadoop2.version</name>
+          <name>!hadoop2</name>
         </property>
       </activation>
       <dependencies>
@@ -230,7 +230,7 @@
       <id>hadoop2</id>
       <activation>
         <property>
-          <name>hadoop2.version</name>
+          <name>hadoop2</name>
         </property>
       </activation>
       <dependencies>

@@ -105,6 +105,7 @@
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
     <hadoop.1.version>1.2.1</hadoop.1.version>
+    <hadoop.2.version>2.2.0</hadoop.2.version>
     <lucene.version>4.6.1</lucene.version>
     <slf4j.version>1.7.5</slf4j.version>
   </properties>
@@ -683,7 +684,7 @@
       <id>hadoop1</id>
       <activation>
         <property>
-          <name>!hadoop2.version</name>
+          <name>!hadoop2</name>
         </property>
       </activation>
       <dependencyManagement>
@@ -758,7 +759,7 @@
       <id>hadoop2</id>
       <activation>
         <property>
-          <name>hadoop2.version</name>
+          <name>hadoop2</name>
         </property>
       </activation>
       <dependencyManagement>
@@ -766,7 +767,7 @@
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-auth</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
         </dependency>
         <dependency>
           <groupId>log4j</groupId>
@@ -781,17 +782,17 @@
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-yarn-common</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-yarn-api</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-common</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
           <exclusions>
             <exclusion>
               <groupId>net.sf.kosmosfs</groupId>
@@ -854,15 +855,38 @@
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-mapreduce-client-core</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
         </dependency>
         <dependency>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-mapreduce-client-common</artifactId>
-          <version>${hadoop2.version}</version>
+          <version>${hadoop.2.version}</version>
         </dependency>
         </dependencies>
       </dependencyManagement>
+      <build>
+        <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.1</version>
+          <executions>
+            <execution>
+              <phase>validate</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <tasks>
+                  <echo>******** Hadoop version ********</echo>
+                  <echo>${hadoop.2.version}</echo>
+                </tasks>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+      </build>
     </profile>
     <profile>
       <id>fastinstall</id>
