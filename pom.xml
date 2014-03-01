@@ -684,7 +684,7 @@
       <id>hadoop1</id>
       <activation>
         <property>
-          <name>!hadoop2</name>
+          <name>hadoop1</name>
         </property>
       </activation>
       <dependencyManagement>
@@ -758,6 +758,7 @@
     <profile>
       <id>hadoop2</id>
       <activation>
+        <activeByDefault>false</activeByDefault>
         <property>
           <name>hadoop2</name>
         </property>
