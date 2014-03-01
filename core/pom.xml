@@ -231,7 +231,7 @@
       <activation>
         <activeByDefault>true</activeByDefault>
         <property>
-          <name>hadoop2</name>
+          <name>hadoop.2.version</name>
         </property>
       </activation>
       <dependencies>
