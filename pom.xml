@@ -758,7 +758,7 @@
     <profile>
       <id>hadoop2</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <activeByDefault>true</activeByDefault>
         <property>
           <name>hadoop2</name>
         </property>
