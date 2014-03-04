@@ -66,7 +66,7 @@ public class FileBasedMatrixTest extends MahoutTestCase {
 
   @Test
   public void testSetData() throws IOException {
-    File f = File.createTempFile("matrix", ".m");
+    File f = File.createTempFile("matrix", ".m", new File(System.getProperty("java.io.tmpdir")));
     f.deleteOnExit();
 
     Matrix m0 = new DenseMatrix(100000, 30);
