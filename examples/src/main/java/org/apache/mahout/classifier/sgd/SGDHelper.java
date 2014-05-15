@@ -35,8 +35,6 @@ import org.apache.mahout.vectorizer.encoders.Dictionary;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class SGDHelper {
 
@@ -44,8 +42,6 @@ public final class SGDHelper {
 
   private SGDHelper() {
   }
-  
-  private static final Logger log = LoggerFactory.getLogger(SGDHelper.class);
 
   public static void dissect(int leakType,
                              Dictionary dictionary,
@@ -142,10 +138,8 @@ public final class SGDHelper {
     }
     if (k % (bump * scale) == 0) {
       if (best != null) {
-          File tmpFile = new File(System.getProperty("java.io.tmpdir"));
-          log.info("Path tmp: " + tmpFile.getAbsolutePath());
-          ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+System.getProperty("file.separator")+"news-group-" + k + ".model",
-                best.getPayload().getLearner().getModels().get(0));
+        File modelFile = new File(System.getProperty("java.io.tmpdir"), "news-group-" + k + ".model");
+        ModelSerializer.writeBinary(modelFile.getAbsolutePath(), best.getPayload().getLearner().getModels().get(0));
       }
 
       info.setStep(info.getStep() + 0.25);

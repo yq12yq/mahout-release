@@ -61,7 +61,6 @@ public final class Driver {
 
   /** used for JSON serialization/deserialization */
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-  private static final String WINDOWS_OS = "Windows";
 
   private Driver() { }
   
@@ -205,34 +204,31 @@ public final class Driver {
   }
 
   protected static void writeLabelBindings(Writer writer, ARFFModel arffModel, String delimiter) throws IOException {
-    String lineSeparator = "\n";
-    if(System.getProperty("os.name").startsWith(WINDOWS_OS)){
-      lineSeparator = "\r\n";
-    }
+
     Map<String, Integer> labels = arffModel.getLabelBindings();
-    writer.write("Label bindings for Relation " + arffModel.getRelation() + lineSeparator);
+    writer.write("Label bindings for Relation " + arffModel.getRelation() + '\n');
     for (Map.Entry<String, Integer> entry : labels.entrySet()) {
       writer.write(entry.getKey());
       writer.write(delimiter);
       writer.write(String.valueOf(entry.getValue()));
-      writer.write(lineSeparator);
+      writer.write('\n');
     }
-    writer.write(lineSeparator);
-    writer.write("Values for nominal attributes"+lineSeparator);
+    writer.write('\n');
+    writer.write("Values for nominal attributes\n");
     // emit allowed values for NOMINAL/categorical/enumerated attributes
     Map<String, Map<String, Integer>> nominalMap = arffModel.getNominalMap();
     // how many nominal attributes
-    writer.write(String.valueOf(nominalMap.size()) + lineSeparator);
+    writer.write(String.valueOf(nominalMap.size()) + "\n");
 
     for (Entry<String, Map<String, Integer>> entry : nominalMap.entrySet()) {
       // the label of this attribute
-      writer.write(entry.getKey() + lineSeparator);
+      writer.write(entry.getKey() + "\n");
       Set<Entry<String, Integer>> attributeValues = entry.getValue().entrySet();
       // how many values does this attribute have
-      writer.write(attributeValues.size() + lineSeparator);
+      writer.write(attributeValues.size() + "\n");
       for (Map.Entry<String, Integer> value : attributeValues) {
         // the value and the value index
-        writer.write(String.format("%s%s%s"+lineSeparator, value.getKey(), delimiter, value.getValue().toString()));
+        writer.write(String.format("%s%s%s\n", value.getKey(), delimiter, value.getValue().toString()));
       }
     }
   }

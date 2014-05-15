@@ -2,9 +2,115 @@ Mahout Change Log
 
 Release 1.0 - unreleased
 
-  MAHOUT-1419: Random decision forest is excessively slow on numeric features (srowen)
+  MAHOUT-1532: Add solve() function to the Scala DSL (ssc)
 
-  MAHOUT-1329: Mahout for hadoop 2  (gcapan, Sergey Svinarchuk)
+  MAHOUT-1548: Fix broken links in quickstart webpage (Andrew Palumbo via ssc)
+
+  MAHOUT-1428: Recommending already consumed items (Dodi Hakim via ssc)
+
+  MAHOUT-1533: Remove Frequent Pattern Mining (ssc)
+
+  MAHOUT-1526: Ant file in examples (ssc)
+
+  MAHOUT-1530: Custom prompt and welcome message for the Spark Shell (ssc)
+
+  MAHOUT-1521: lucene2seq - Error trying to load data from stored field (when non-indexed) (Terry Blankers via frankscholten)
+
+  MAHOUT-1310: Mahout support windows (Sergey Svinarchuk via ssc)
+
+  MAHOUT-1520: Fix links in Mahout website documentation (Saleem Ansari via smarthi)
+
+  MAHOUT-1523: Remove @author tags in sparkbindings (ssc)
+
+  MAHOUT-1510: Goodbye MapReduce (ssc)
+
+  MAHOUT-1519: Remove StandardThetaTrainer (Andrew Palumbo via ssc)
+
+  MAHOUT-1496: Create a website describing the distributed ALS recommender (Jian Wang via ssc)
+
+  MAHOUT-1502: Update Naive Bayes Webpage to Current Implementation (Andrew Palumbo via ssc)
+
+  MAHOUT-1517: Remove casts to int in ALSWRFactorizer (ssc)
+  
+  MAHOUT-1425: SGD classifier example with bank marketing dataset. (frankscholten)
+
+  MAHOUT-1511: Renaming core to mrlegacy (frankscholten)
+
+  MAHOUT-1497: mahout resplit not producing splited files (ssc)
+
+  MAHOUT-1513: Deprecate Canopy Clustering (ssc)
+
+  MAHOUT-1440: Add option to set the RNG seed for inital cluster generation in Kmeans/fKmeans (Andrew Palumbo via ssc)
+
+  MAHOUT-1445: Create an intro for item based recommender (Nick Martin via ssc)
+
+  MAHOUT-1509: Invalid URL in link from "quick start/basics" page (Nick Martin, smarthi)
+
+  MAHOUT-1508: Performance problems with sparse matrices (ssc)
+
+  MAHOUT-1504: Enable/fix thetaSummer job in TrainNaiveBayesJob (Andrew Palumbo, smarthi)
+
+  MAHOUT-1503: TestNaiveBayesDriver fails in sequential mode (Andrew Palumbo, smarthi)
+
+  MAHOUT-1501: ClusterOutputPostProcessorDriver has private default constructor (ssc)
+
+  MAHOUT-1491: Spectral KMeans Clustering doesn't clean its /tmp dir and fails when seeing it again (smarthi)
+
+  MAHOUT-1488: DisplaySpectralKMeans fails: examples/output/clusteredPoints/part-m-00000 does not exist (Saleem Ansari via smarthi)
+
+  MAHOUT-1483: Organize links in web site navigation bar (akm)
+
+  MAHOUT-1482: Rework quickstart website (Jian Wang via ssc)
+
+  MAHOUT-1476: Cleanup website on Hidden Markov Models (akm)
+
+  MAHOUT-1475: Cleanup website on Naive Bayes (smarthi)
+
+  MAHOUT-1472: Cleanup website on fuzzy kmeans (smarthi)
+
+  MAHOUT-1471: Cleanup website for Canopy clustering (smarthi)
+
+  MAHOUT-1468: Creating a new page for StreamingKMeans documentation on mahout website (Maxim Arap and Pavan Kumar via akm)
+
+  MAHOUT-1467: ClusterClassifier readPolicy leaks file handles (Avi Shinnar, smarthi)
+
+  MAHOUT-1466: Cluster visualization fails to execute (ssc)
+  
+  MAHOUT-1465: Clean up README (akm)
+
+  MAHOUT-1463: Modify OnlineSummarizers to use the TDigest dependency from Maven Central (tdunning, smarthi)
+
+  MAHOUT-1460: Remove reference to Dirichlet in ClusterIterator (frankscholten)
+
+  MAHOUT-1459: Move Hadoop related code out of CanopyClusterer (frankscholten)
+
+  MAHOUT-1458: Remove KMeansConfigKeys and FuzzyKMeansConfigKeys (frankscholten)
+
+  MAHOUT-1457: Move EigenSeedGenerator into spectral kmeans package (frankscholten)
+
+  MAHOUT-1455: Forkcount config causes JVM crashes during build (frankscholten)
+
+  MAHOUT-1451: Cleaning up the examples for clustering on the website (Gaurav Misra via ssc)
+
+  MAHOUT-1450: Cleaning up clustering documentation on mahout website (Pavan Kumar)
+
+  MAHOUT-1449: Update the Known Issues in Random Forests Page (Manoj Awasthi via ssc)
+
+  MAHOUT-1448: In Random Forest, the training does not support multiple input files. The input dataset must be one single file. (Manoj Awasthi via ssc)
+
+  MAHOUT-1447: ImplicitFeedbackAlternatingLeastSquaresSolver tests and features (Adam Ilardi via ssc)
+
+  MAHOUT-1438: "quickstart" tutorial for building a simple recommender (Maciej Mazur and Steve Cook via ssc)
+
+  MAHOUT-1434: Dead links on the web ste (Kevin Moulart, smarthi)
+
+  MAHOUT-1433: Make SVDRecommender look at all unknown items of a user per default (ssc)
+
+  MAHOUT-1429: Parallelize YtransposeY in ImplicitFeedbackAlternatingLeastSquaresSolver (Adam Ilardi via ssc)
+
+  MAHOUT-1420: Add solr-recommender to examples (Pat Ferrel via akm)
+
+  MAHOUT-1419: Random decision forest is excessively slow on numeric features (srowen)
 
   MAHOUT-1417: Random decision forest implementation fails in Hadoop 2 (srowen)
 
@@ -12,7 +118,15 @@ Release 1.0 - unreleased
   
   MAHOUT-1415: Clone method on sparse matrices fails if there is an empty row which has not been set explicitly (till.rohrmann via ssc)
 
+  MAHOUT-1413: Rework Algorithms page (ssc)
+
+  MAHOUT-1356: Ensure unit tests fail fast when writing outside mvn target directory (isabel, smarthi, dweiss, frankscholten, akm)
+
+  MAHOUT-1329: Mahout for hadoop 2 (gcapan, Sergey Svinarchuk)
+
 Release 0.9 - 2014-02-01
+
+  MAHOUT-1387: Create page for release notes (ssc)
 
   MAHOUT-1411: Random test failures from TDigestTest (smarthi)
 
@@ -53,6 +167,8 @@ Release 0.9 - 2014-02-01
   MAHOUT-1378: Running Random Forest with Ignored features fails when loading feature descriptor from JSON file (Sam Wu via smarthi)
 
   MAHOUT-1377: Exclude JUnit.jar from tarball (Sergey Svinarchuk via smarthi)
+
+  MAHOUT-1374: Ability to provide input file with userid, itemid pair (Aliaksei Litouka via ssc)
 
   MAHOUT-1371: Arff loader can misinterpret nominals with integer, real or string (Mansur Iqbal via smarthi)
 

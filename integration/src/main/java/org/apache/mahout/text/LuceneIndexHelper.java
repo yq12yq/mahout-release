@@ -16,13 +16,13 @@ package org.apache.mahout.text;
  * limitations under the License.
  */
 
-import org.apache.lucene.search.CollectionStatistics;
-import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexableField;
 
 import java.io.IOException;
 
 /**
- * Utility for checking if a field exist in a Lucene index.
+ * Utility for checking if a field is stored in a Lucene index.
  */
 public class LuceneIndexHelper {
 
@@ -30,10 +30,10 @@ public class LuceneIndexHelper {
 
   }
 
-  public static void fieldShouldExistInIndex(IndexSearcher searcher, String field) throws IOException {
-    CollectionStatistics idFieldStatistics = searcher.collectionStatistics(field);
-    if (idFieldStatistics.docCount() == 0) {
-      throw new IllegalArgumentException("Field '" + field + "' does not exist in the index");
+  public static void fieldShouldExistInIndex(IndexReader reader, String fieldName) throws IOException {
+    IndexableField field = reader.document(0).getField(fieldName);
+    if (field == null || !field.fieldType().stored()) {
+      throw new IllegalArgumentException("Field '" + fieldName + "' is possibly not stored since first document in index does not contain this field.");
     }
   }
 

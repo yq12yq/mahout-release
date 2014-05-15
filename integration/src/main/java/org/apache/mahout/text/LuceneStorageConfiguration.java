@@ -146,7 +146,7 @@ public class LuceneStorageConfiguration implements Writable {
    */
   public Iterator<Pair<Text, Text>> getSequenceFileIterator() {
     return new SequenceFileDirIterable<Text, Text>(sequenceFilesOutputPath, PathType.LIST, PathFilters.logsCRCFilter(),
-        configuration).iterator();
+                                                   configuration).iterator();
   }
 
   public Configuration getConfiguration() {

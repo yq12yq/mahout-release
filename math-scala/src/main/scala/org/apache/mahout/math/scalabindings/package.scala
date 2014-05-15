@@ -134,7 +134,11 @@ package object scalabindings {
           return new DenseMatrix(t)
         else
           throw new IllegalArgumentException(
-            "double[][] data parameter can be the only argumentn for dense()")
+            "double[][] data parameter can be the only argument for dense()")
+        case t:Array[Vector] =>
+          val m = new DenseMatrix(t.size,t.head.length)
+          t.view.zipWithIndex.foreach({case(v,idx) => m(idx,::) := v})
+          return m
         case _ => throw new IllegalArgumentException("unsupported type in the inline Matrix initializer")
       }
     }
@@ -177,11 +181,13 @@ package object scalabindings {
     sv
   }
 
+  def dvec(fromV: Vector) = new DenseVector(fromV)
+
   def dvec(ddata: TraversableOnce[Double]) = new DenseVector(ddata.toArray)
 
   def dvec(numbers: Number*) = new DenseVector(numbers.map(_.doubleValue()).toArray)
 
-  def chol(m: Matrix, typ: Boolean = false) = new CholeskyDecomposition(m, typ)
+  def chol(m: Matrix, pivoting: Boolean = false) = new CholeskyDecomposition(m, pivoting)
 
   /**
    * computes SVD
@@ -230,6 +236,70 @@ package object scalabindings {
     (qrdec.getQ, qrdec.getR)
   }
 
+ /**
+  * Solution <tt>X</tt> of <tt>A*X = B</tt> using QR-Decomposition, where <tt>A</tt> is a square, non-singular matrix.
+   *
+   * @param a
+   * @param b
+   * @return (X)
+   */
+  def solve(a: Matrix, b: Matrix): Matrix = {
+   import MatrixOps._
+   if (a.nrow != a.ncol) {
+     throw new IllegalArgumentException("supplied matrix A is not square")
+   }
+   val qr = new QRDecomposition(a cloned)
+   if (!qr.hasFullRank) {
+     throw new IllegalArgumentException("supplied matrix A is singular")
+   }
+   qr.solve(b)
+  }
+
+  /**
+   * Solution <tt>A^{-1}</tt> of <tt>A*A^{-1} = I</tt> using QR-Decomposition, where <tt>A</tt> is a square,
+   * non-singular matrix. Here only for compatibility with R semantics.
+   *
+   * @param a
+   * @return (A^{-1})
+   */
+  def solve(a: Matrix): Matrix = {
+    import MatrixOps._
+    solve(a, eye(a.nrow))
+  }
+
+  /**
+   * Solution <tt>x</tt> of <tt>A*x = b</tt> using QR-Decomposition, where <tt>A</tt> is a square, non-singular matrix.
+   *
+   * @param a
+   * @param b
+   * @return (x)
+   */
+  def solve(a: Matrix, b: Vector): Vector = {
+    import MatrixOps._
+    val x = solve(a, b.toColMatrix)
+    x(::, 0)
+  }
+
   def ssvd(a: Matrix, k: Int, p: Int = 15, q: Int = 0) = SSVD.ssvd(a, k, p, q)
+
+  /**
+   * PCA based on SSVD that runs without forming an always-dense A-(colMeans(A)) input for SVD. This
+   * follows the solution outlined in MAHOUT-817. For in-core version it, for most part, is supposed
+   * to save some memory for sparse inputs by removing direct mean subtraction.<P>
+   *
+   * Hint: Usually one wants to use AV which is approsimately USigma, i.e.<code>u %*%: diagv(s)</code>.
+   * If retaining distances and orignal scaled variances not that important, the normalized PCA space
+   * is just U.
+   *
+   * Important: data points are considered to be rows.
+   *
+   * @param a input matrix A
+   * @param k request SSVD rank
+   * @param p oversampling parameter
+   * @param q number of power iterations
+   * @return (U,V,s)
+   */
+  def spca(a: Matrix, k: Int, p: Int = 15, q: Int = 0) =
+    SSVD.spca(a = a, k = k, p = p, q = q)
 
 }

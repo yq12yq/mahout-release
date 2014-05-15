@@ -1,11 +1,3 @@
-package org.apache.mahout.math.scalabindings
-
-import org.scalatest.FunSuite
-import org.apache.mahout.math.DenseSymmetricMatrix
-import scala.math._
-import RLikeOps._
-import scala._
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -23,7 +15,18 @@ import scala._
  * limitations under the License.
  */
 
-class MathSuite extends FunSuite {
+package org.apache.mahout.math.scalabindings
+
+import org.scalatest.{Matchers, FunSuite}
+import org.apache.mahout.math._
+import scala.math._
+import RLikeOps._
+import scala._
+import scala.util.Random
+import org.apache.mahout.test.MahoutSuite
+import org.apache.mahout.common.RandomUtils
+
+class MathSuite extends FunSuite with MahoutSuite {
 
   test("chol") {
 
@@ -59,7 +62,7 @@ class MathSuite extends FunSuite {
 
     printf("AX - B = \n%s\n", axmb.toString)
 
-    assert(axmb.norm < 1e-10)
+    axmb.norm should be < 1e-10
 
   }
 
@@ -123,6 +126,53 @@ class MathSuite extends FunSuite {
       assert(abs(q(::, i) dot q(::, j)) < 1e-10)
   }
 
+  test("solve matrix-vector") {
+    val a = dense((1, 3), (4, 2))
+    val b = dvec(11, 14)
+    val x = solve(a, b)
+
+    val control = dvec(2, 3)
+
+    (control - x).norm(2) should be < 1e-10
+  }
+
+  test("solve matrix-matrix") {
+    val a = dense((1, 3), (4, 2))
+    val b = dense((11), (14))
+    val x = solve(a, b)
+
+    val control = dense((2), (3))
+
+    (control - x).norm should be < 1e-10
+  }
+
+  test("solve to obtain inverse") {
+    val a = dense((1, 3), (4, 2))
+    val x = solve(a)
+
+    val identity = a %*% x
+
+    val control = eye(identity.ncol)
+
+    (control - identity).norm should be < 1e-10
+  }
+
+  test("solve rejects non-square matrix") {
+    intercept[IllegalArgumentException] {
+      val a = dense((1, 2, 3), (4, 5, 6))
+      val b = dvec(1, 2)
+      solve(a, b)
+    }
+  }
+
+  test("solve rejects singular matrix") {
+    intercept[IllegalArgumentException] {
+      val a = dense((1, 2), (2 , 4))
+      val b = dvec(1, 2)
+      solve(a, b)
+    }
+  }
+
   test("svd") {
 
     val a = dense((1, 2, 3), (3, 4, 5))
@@ -144,22 +194,96 @@ class MathSuite extends FunSuite {
   }
 
   test("ssvd") {
+    val a = dense(
+      (1, 2, 3),
+      (3, 4, 5),
+      (-2, 6, 7),
+      (-3, 8, 9)
+    )
 
-    val a = dense((1, 2, 3), (3, 4, 5))
+    val rank = 2
+    val (u, v, s) = ssvd(a, k = rank, q = 1)
 
-    val (u, v, s) = ssvd(a, 2, q = 1)
+    val (uControl, vControl, sControl) = svd(a)
 
     printf("U:\n%s\n", u)
+    printf("U-control:\n%s\n", uControl)
     printf("V:\n%s\n", v)
+    printf("V-control:\n%s\n", vControl)
     printf("Sigma:\n%s\n", s)
+    printf("Sigma-control:\n%s\n", sControl)
 
-    val aBar = u %*% diagv(s) %*% v.t
+    (s - sControl(0 until rank)).norm(2) should be < 1E-7
 
-    val amab = a - aBar
+    // Singular vectors may be equivalent down to a sign only.
+    (u.norm - uControl(::, 0 until rank).norm).abs should be < 1E-7
+    (v.norm - vControl(::, 0 until rank).norm).abs should be < 1E-7
 
-    printf("A-USV'=\n%s\n", amab)
+  }
 
-    assert(amab.norm < 1e-10)
+  test("spca") {
+
+    import math._
+
+    val rnd = RandomUtils.getRandom
+
+    // Number of points
+    val m =  500
+    // Length of actual spectrum
+    val spectrumLen = 40
+
+    val spectrum = dvec((0 until spectrumLen).map(x => 300.0 * exp(-x) max 1e-3))
+    printf("spectrum:%s\n", spectrum)
+
+    val (u, _) = qr(new SparseRowMatrix(m, spectrumLen) :=
+        ((r, c, v) => if (rnd.nextDouble() < 0.2) 0 else rnd.nextDouble() + 5.0))
+
+    // PCA Rotation matrix -- should also be orthonormal.
+    val (tr, _) = qr(Matrices.symmetricUniformView(spectrumLen, spectrumLen, rnd.nextInt) - 10.0)
+
+    val input = (u %*%: diagv(spectrum)) %*% tr.t
+
+    // Calculate just first 10 principal factors and reduce dimensionality.
+    // Since we assert just validity of the s-pca, not stochastic error, we bump p parameter to
+    // ensure to zero stochastic error and assert only functional correctness of the method's pca-
+    // specific additions.
+    val k = 10
+    var (pca, _, s) = spca(a = input, k = k, p=spectrumLen, q = 1)
+    printf("Svs:%s\n",s)
+    // Un-normalized pca data:
+    pca = pca %*%: diagv(s)
+
+    // Of course, once we calculated the pca, the spectrum is going to be different since our originally
+    // generated input was not centered. So here, we'd just brute-solve pca to verify
+    val xi = input.colMeans()
+    for (r <- 0 until input.nrow) input(r, ::) -= xi
+    var (pcaControl, _, sControl) = svd(m = input)
+
+    printf("Svs-control:%s\n",sControl)
+    pcaControl = (pcaControl %*%: diagv(sControl))(::,0 until k)
+
+    printf("pca:\n%s\n", pca(0 until 10, 0 until 10))
+    printf("pcaControl:\n%s\n", pcaControl(0 until 10, 0 until 10))
+
+    (pca(0 until 10, 0 until 10).norm - pcaControl(0 until 10, 0 until 10).norm).abs should be < 1E-5
+
+  }
+
+  test("random uniform") {
+    val omega1 = Matrices.symmetricUniformView(2, 3, 1234)
+    val omega2 = Matrices.symmetricUniformView(2, 3, 1234)
+
+    val a = sparse(
+      0 -> 1 :: 1 -> 2 :: Nil,
+      0 -> 3 :: 1 -> 4 :: Nil,
+      0 -> 2 :: 1 -> 0.0 :: Nil
+    )
+
+    val block = a(0 to 0, ::).cloned
+    val block2 = a(1 to 1, ::).cloned
+
+    (block %*% omega1 - (a %*% omega2)(0 to 0, ::)).norm should be < 1e-7
+    (block2 %*% omega1 - (a %*% omega2)(1 to 1, ::)).norm should be < 1e-7
 
   }
 

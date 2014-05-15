@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.mahout</groupId>
     <artifactId>mahout</artifactId>
-    <version>0.9.0</version>
+    <version>1.0.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -72,11 +72,11 @@
     <!-- own modules -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-core</artifactId>
+      <artifactId>mahout-mrlegacy</artifactId>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>mahout-core</artifactId>
+      <artifactId>mahout-mrlegacy</artifactId>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>

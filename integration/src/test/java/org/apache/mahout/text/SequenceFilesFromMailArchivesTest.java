@@ -22,6 +22,7 @@ import java.util.zip.GZIPOutputStream;
 
 import com.google.common.io.Closeables;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,7 +33,6 @@ import org.apache.mahout.common.Pair;
 import org.apache.mahout.common.iterator.sequencefile.SequenceFileIterator;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -64,7 +64,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     } finally {
       Closeables.close(gzOut, false);
     }
-
+    
     File subDir2 = new File(subDir, "subsubdir");
     subDir2.mkdir();
     File gzFile2 = new File(subDir2, "mail-messages-2.gz");
@@ -74,7 +74,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
       gzOut.finish();
     } finally {
       Closeables.close(gzOut, false);
-    }
+    }    
   }
 
   @Test
@@ -161,8 +161,9 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     Pair<Text, Text> record = iterator.next();
 
     File parentFileSubSubDir = new File(new File(new File(new File("TEST"), "subdir"), "subsubdir"), "mail-messages-2.gz");
+
     String expected = record.getFirst().toString();
-    if(System.getProperty("os.name").startsWith("Windows")){
+    if (SystemUtils.IS_OS_WINDOWS) {
       expected = expected.replace("/", "\\");
     }
     Assert.assertEquals(new File(parentFileSubSubDir, testVars[0][0]).toString(), expected);
@@ -171,8 +172,8 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
 
     record = iterator.next();
     expected = record.getFirst().toString();
-    if(System.getProperty("os.name").startsWith("Windows")){
-       expected = expected.replace("/", "\\");
+    if (SystemUtils.IS_OS_WINDOWS) {
+      expected = expected.replace("/", "\\");
     }
     Assert.assertEquals(new File(parentFileSubSubDir, testVars[1][0]).toString(), expected);
     Assert.assertEquals(testVars[1][1] + testVars[1][2], record.getSecond().toString());
@@ -181,7 +182,7 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
     File parentFile = new File(new File(new File("TEST"), "subdir"), "mail-messages.gz");
     record = iterator.next();
     expected = record.getFirst().toString();
-    if(System.getProperty("os.name").startsWith("Windows")){
+    if (SystemUtils.IS_OS_WINDOWS) {
       expected = expected.replace("/", "\\");
     }
     Assert.assertEquals(new File(parentFile, testVars[0][0]).toString(), expected);
@@ -190,8 +191,8 @@ public final class SequenceFilesFromMailArchivesTest extends MahoutTestCase {
 
     record = iterator.next();
     expected = record.getFirst().toString();
-    if(System.getProperty("os.name").startsWith("Windows")){
-       expected = expected.replace("/", "\\");
+    if (SystemUtils.IS_OS_WINDOWS) {
+      expected = expected.replace("/", "\\");
     }
     Assert.assertEquals(new File(parentFile, testVars[1][0]).toString(), expected);
     Assert.assertEquals(testVars[1][1] + testVars[1][2], record.getSecond().toString());

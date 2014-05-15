@@ -20,12 +20,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mahout</groupId>
   <artifactId>mahout</artifactId>
-  <version>0.9.0</version>
+  <version>1.0.0</version>
 
   <parent>
     <groupId>org.apache</groupId>
     <artifactId>apache</artifactId>
-    <version>9</version>
+    <version>10</version>
   </parent>
 
   <packaging>pom</packaging>
@@ -108,6 +108,9 @@
     <hadoop.2.version>2.2.0</hadoop.2.version>
     <lucene.version>4.6.1</lucene.version>
     <slf4j.version>1.7.5</slf4j.version>
+    <scala.major>2.10</scala.major>
+    <scala.version>2.10.3</scala.version>
+    <spark.version>0.9.1</spark.version>
   </properties>
   <issueManagement>
     <system>Jira</system>
@@ -139,14 +142,14 @@
       <!-- our modules -->
 
       <dependency>
-        <artifactId>mahout-core</artifactId>
+        <artifactId>mahout-mrlegacy</artifactId>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>${project.groupId}</groupId>
         <version>${project.version}</version>
-        <artifactId>mahout-core</artifactId>
+        <artifactId>mahout-mrlegacy</artifactId>
         <type>test-jar</type>
         <scope>test</scope>
       </dependency>
@@ -317,7 +320,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>15.0</version>
+        <version>16.0</version>
       </dependency>
 
       <dependency>
@@ -401,6 +404,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -537,9 +545,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <forkCount>1.5C</forkCount>
+          <forkCount>2</forkCount>
           <reuseForks>false</reuseForks>
-          <argLine>-Xmx1024m -Djava.library.path=${env.HADOOP_HOME}\bin</argLine>
+          <argLine>-Xmx512m -Djava.security.manager -Djava.library.path=${env.HADOOP_HOME}\bin
+          -Djava.security.policy=${project.build.directory}/../../buildtools/src/test/resources/java.policy</argLine>
+          <argLine>-Djava.security.auth.login.config=${project.build.directory}/../../buildtools/src/test/resources/jaas.config</argLine>
           <testFailureIgnore>false</testFailureIgnore>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <systemPropertyVariables>
@@ -673,11 +683,13 @@
   <modules>
     <module>buildtools</module>
     <module>math</module>
-    <module>core</module>
+    <module>mrlegacy</module>
     <module>integration</module>
     <module>examples</module>
     <module>distribution</module>
     <module>math-scala</module>
+    <module>spark</module>
+    <module>spark-shell</module>
   </modules>
   <profiles>
     <profile>
@@ -1269,3 +1281,4 @@
     </plugins>
   </reporting>
 </project>
+  

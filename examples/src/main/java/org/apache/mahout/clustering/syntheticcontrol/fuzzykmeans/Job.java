@@ -44,7 +44,6 @@ public final class Job extends AbstractJob {
   private static final Logger log = LoggerFactory.getLogger(Job.class);
   
   private static final String DIRECTORY_CONTAINING_CONVERTED_INPUT = "data";
-  private static final String WINDOWS_OS = "Windows";
   
   private static final String M_OPTION = FuzzyKMeansDriver.M_OPTION;
   
@@ -57,18 +56,10 @@ public final class Job extends AbstractJob {
       ToolRunner.run(new Configuration(), new Job(), args);
     } else {
       log.info("Running with default arguments");
-      Path output;
-      Path input;
-      if(System.getProperty("os.name").startsWith(WINDOWS_OS)){
-          output = new Path("/user/" + System.getProperty("user.name") + "/output");
-          input = new Path("/user/" + System.getProperty("user.name") + "/testdata");
-      } else {
-          output = new Path("output");
-          input = new Path("testdata");
-      }
+      Path output = new Path("output");
       Configuration conf = new Configuration();
       HadoopUtil.delete(conf, output);
-      run(conf, input, output, new EuclideanDistanceMeasure(), 80, 55, 10, 2.0f, 0.5);
+      run(conf, new Path("testdata"), output, new EuclideanDistanceMeasure(), 80, 55, 10, 2.0f, 0.5);
     }
   }
   

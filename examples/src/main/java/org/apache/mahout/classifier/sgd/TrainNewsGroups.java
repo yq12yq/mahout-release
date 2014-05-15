@@ -32,8 +32,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Ordering;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Reads and trains an adaptive logistic regression model on the 20 newsgroups data.
@@ -84,7 +82,6 @@ public final class TrainNewsGroups {
 
   private TrainNewsGroups() {
   }
-  private static final Logger log = LoggerFactory.getLogger(TrainNewsGroups.class);
 
   public static void main(String[] args) throws IOException {
     File base = new File(args[0]);
@@ -134,10 +131,10 @@ public final class TrainNewsGroups {
     learningAlgorithm.close();
     SGDHelper.dissect(leakType, newsGroups, learningAlgorithm, files, overallCounts);
     System.out.println("exiting main");
-    File tmpFile = new File(System.getProperty("java.io.tmpdir"));
-    log.info("Path tmp: " + tmpFile.getAbsolutePath());
-    ModelSerializer.writeBinary(tmpFile.getAbsoluteFile().toString()+System.getProperty("file.separator")+"news-group.model",
-            learningAlgorithm.getBest().getPayload().getLearner().getModels().get(0));
+
+    File modelFile = new File(System.getProperty("java.io.tmpdir"), "news-group.model");
+    ModelSerializer.writeBinary(modelFile.getAbsolutePath(),
+        learningAlgorithm.getBest().getPayload().getLearner().getModels().get(0));
 
     List<Integer> counts = Lists.newArrayList();
     System.out.println("Word counts");

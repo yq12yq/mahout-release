@@ -30,7 +30,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
@@ -311,7 +311,7 @@ public final class HBaseDataModel implements DataModel, Closeable {
     }
 
     if (result.containsColumn(ITEMS_CF, Bytes.toBytes(itemID))) {
-      Cell kv = result.getColumnLatest(ITEMS_CF, Bytes.toBytes(itemID));
+      KeyValue kv = result.getColumnLatest(ITEMS_CF, Bytes.toBytes(itemID));
       return kv.getTimestamp();
     } else {
       return null;
