@@ -183,7 +183,6 @@
       <dependency>
         <groupId>org.apache.mahout</groupId>
         <artifactId>mahout-mrlegacy</artifactId>
-        <version>${pom.version}</version>
         <exclusions>
           <exclusion>
             <groupId>asm</groupId>
@@ -222,7 +221,6 @@
     <dependency>
       <groupId>org.apache.mahout</groupId>
       <artifactId>mahout-mrlegacy</artifactId>
-      <version>${pom.version}</version>
       <exclusions>
         <exclusion>
           <groupId>asm</groupId>
@@ -234,14 +232,12 @@
     <dependency>
       <groupId>org.apache.mahout</groupId>
       <artifactId>mahout-math-scala</artifactId>
-      <version>${pom.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.mahout</groupId>
       <artifactId>mahout-math-scala</artifactId>
       <classifier>tests</classifier>
-      <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
 
