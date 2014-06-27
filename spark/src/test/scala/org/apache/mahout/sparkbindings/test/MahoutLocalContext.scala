@@ -1,19 +1,20 @@
 package org.apache.mahout.sparkbindings.test
 
 import org.scalatest.Suite
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.SparkConf
 import org.apache.mahout.sparkbindings._
 import org.apache.mahout.test.MahoutSuite
+import org.apache.mahout.math.drm.DistributedContext
 
 trait MahoutLocalContext extends MahoutSuite with LoggerConfiguration {
   this: Suite =>
 
-  protected implicit var mahoutCtx: SparkContext = _
+  protected implicit var mahoutCtx: DistributedContext = _
 
   override protected def beforeEach() {
     super.beforeEach()
 
-    mahoutCtx = mahoutSparkContext(masterUrl = "local[3]",
+    mahoutCtx = mahoutSparkContext(masterUrl = "local[2]",
       appName = "MahoutLocalContext",
       // Do not run MAHOUT_HOME jars in unit tests.
       addMahoutJars = false,
@@ -26,7 +27,7 @@ trait MahoutLocalContext extends MahoutSuite with LoggerConfiguration {
   override protected def afterEach() {
     if (mahoutCtx != null) {
       try {
-        mahoutCtx.stop()
+        mahoutCtx.close()
       } finally {
         mahoutCtx = null
       }

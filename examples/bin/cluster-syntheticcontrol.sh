@@ -27,14 +27,13 @@ if [ "$1" = "--help" ] || [ "$1" = "--?" ]; then
   exit
 fi
 
-algorithm=( canopy kmeans fuzzykmeans )
+algorithm=( kmeans fuzzykmeans )
 if [ -n "$1" ]; then
   choice=$1
 else
   echo "Please select a number to choose the corresponding clustering algorithm"
   echo "1. ${algorithm[0]} clustering"
   echo "2. ${algorithm[1]} clustering"
-  echo "3. ${algorithm[2]} clustering"
   read -p "Enter your choice : " choice
 fi
 echo "ok. You chose $choice and we'll use ${algorithm[$choice-1]} Clustering"
@@ -63,7 +62,7 @@ if [ ! -f ${WORK_DIR}/synthetic_control.data ]; then
   echo "Couldn't download synthetic control"
   exit 1
 fi
-if [ "$HADOOP_HOME" != "" ]; then
+if [ "$HADOOP_HOME" != "" ] && [ "$MAHOUT_LOCAL" == "" ]; then
   echo "Checking the health of DFS..."
   $HADOOP_HOME/bin/hadoop fs -ls 
   if [ $? -eq 0 ];then 

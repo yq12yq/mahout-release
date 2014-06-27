@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.apache.mahout</groupId>
     <artifactId>mahout</artifactId>
-    <version>1.0.0</version>
+    <version>1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -216,7 +216,7 @@
       <id>hadoop1</id>
       <activation>
         <property>
-          <name>hadoop1</name>
+          <name>!hadoop2.version</name>
         </property>
       </activation>
       <dependencies>
@@ -229,9 +229,8 @@
     <profile>
       <id>hadoop2</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
         <property>
-          <name>hadoop.2.version</name>
+          <name>hadoop2.version</name>
         </property>
       </activation>
       <dependencies>
