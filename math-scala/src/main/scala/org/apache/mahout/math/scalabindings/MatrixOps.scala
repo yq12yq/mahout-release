@@ -51,6 +51,8 @@ class MatrixOps(val m: Matrix) {
 
   def -(that: Matrix) = cloned -= that
 
+  def -:(that: Matrix) = that - m
+
   // m.plus(that)?
 
   def +(that: Double) = cloned += that
@@ -174,7 +176,7 @@ class MatrixOps(val m: Matrix) {
 
   def rowMeans() = if (m.ncol == 0) rowSums() else rowSums() /= m.ncol
 
-
+  def numNonZeroElementsPerColumn() = m.aggregateColumns(vectorCountNonZeroElementsFunc)
 }
 
 object MatrixOps {
@@ -184,6 +186,11 @@ object MatrixOps {
 
   private def vectorSumFunc = new VectorFunction {
     def apply(f: Vector): Double = f.sum
+  }
+
+  private def vectorCountNonZeroElementsFunc = new VectorFunction {
+    //def apply(f: Vector): Double = f.aggregate(Functions.PLUS, Functions.notEqual(0))
+    def apply(f: Vector): Double = f.getNumNonZeroElements().toDouble
   }
 
 }
