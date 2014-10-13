@@ -42,7 +42,13 @@ function Install(
         $component,
         [String]
         [Parameter( Position=1, Mandatory=$true )]
-        $nodeInstallRoot
+        $nodeInstallRoot,
+        [System.Management.Automation.PSCredential]
+        [Parameter( Position=2, Mandatory=$false )]
+        $serviceCredential,
+        [String]
+        [Parameter( Position=3, Mandatory=$false )]
+        $role
         )
 {
     if ( $component -eq "mahout" )
