@@ -126,6 +126,7 @@
         <enabled>false</enabled>
       </releases>
     </repository>
+    <repository>
       <id>${repoid}</id>
       <name>${reponame}</name>
       <url>${repourl}</url>
