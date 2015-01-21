@@ -120,6 +120,10 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-math</artifactId>
     </dependency>
+     <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-azure</artifactId>
+    </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>mahout-math</artifactId>
