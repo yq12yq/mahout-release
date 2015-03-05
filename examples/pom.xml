@@ -123,6 +123,7 @@
      <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-azure</artifactId>
+      <version>${hadoop2.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
