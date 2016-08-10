@@ -214,13 +214,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.0.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-commons-csv</artifactId>
       <version>3.5.0</version>
