@@ -66,7 +66,7 @@ class SimilarityAnalysisSuite extends FunSuite with MahoutSuite with Distributed
       (0.0,                0.0,                0.6795961471815897, 0.0,                4.498681156950466))
 
 
-  test("cooccurrence [A'A], [B'A] boolbean data using LLR") {
+  test("cooccurrence [A'A], [B'A] boolean data using LLR") {
     val a = dense(
         (1, 1, 0, 0, 0),
         (0, 0, 1, 1, 0),
