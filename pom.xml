@@ -19,7 +19,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mahout</groupId>
   <artifactId>mahout</artifactId>
-  <version>0.9.0.2.6.3.0-SNAPSHOT</version>
+  <version>0.9.0.2.6.4.106-1</version>
 
   <parent>
     <groupId>org.apache</groupId>
@@ -103,9 +103,9 @@
     <mcheckstyle.version>2.10</mcheckstyle.version>
     <mfindbugs.version>2.5.2</mfindbugs.version>
     <mjavadoc.version>2.9.1</mjavadoc.version>
-    <hadoop.version>2.7.3.2.6.3.0-SNAPSHOT</hadoop.version>
+    <hadoop.version>2.7.3.2.6.4.106-1</hadoop.version>
     <hadoop.classifier>hadoop2</hadoop.classifier>
-    <hbase.version>1.1.2.2.6.3.0-SNAPSHOT</hbase.version>
+    <hbase.version>1.1.2.2.6.4.106-1</hbase.version>
     <lucene.version>4.6.1</lucene.version>
     <slf4j.version>1.7.5</slf4j.version>
     <scala.major>2.10</scala.major>
